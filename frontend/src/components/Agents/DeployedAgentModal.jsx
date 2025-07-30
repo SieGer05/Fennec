@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { generateDeployScript } from '../../scripts/deployAgentTemplate';
+import toast from 'react-hot-toast';
 
 const DeployedAgentModal = ({ onClose }) => {
    const [ip, setIp] = useState('');
@@ -17,12 +18,12 @@ const DeployedAgentModal = ({ onClose }) => {
 
    const validateInputs = () => {
       if (!ip.trim()) {
-         alert("Veuillez saisir une adresse IP valide");
+         toast.error("Veuillez saisir une adresse IP valide");
          return false;
       }
       
       if (!port || parseInt(port) < 1 || parseInt(port) > 65535) {
-         alert("Veuillez saisir un numéro de port valide (1-65535)");
+         toast.error("Veuillez saisir un numéro de port valide (1-65535)");
          return false;
       }
       
@@ -31,19 +32,26 @@ const DeployedAgentModal = ({ onClose }) => {
 
    const handleGenerate = () => {
       if (!validateInputs()) return;
-      
+
       setStep(2);
       setIsLoading(true);
-      
-      setTimeout(() => {
-         const scriptContent = generateDeployScript(ip, port);
 
-         const blob = new Blob([scriptContent], { type: 'text/plain' });
-         const url = URL.revokeObjectURL(blob);
-         setDownloadUrl(url);
-         setIsLoading(false);
-         setIsGenerated(true);
-         setStep(3);
+      setTimeout(() => {
+         try {
+            const scriptContent = generateDeployScript(ip, port);
+
+            const blob = new Blob([scriptContent], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+
+            setDownloadUrl(url);
+            setIsGenerated(true);
+            setStep(3);
+         } catch (err) {
+            toast.error('Une erreur est survenue lors de la génération du script.');
+            setStep(1); 
+         } finally {
+            setIsLoading(false);
+         }
       }, 3000);
    };
 
@@ -175,7 +183,7 @@ const DeployedAgentModal = ({ onClose }) => {
                <a
                   href={downloadUrl}
                   download="deploy_agent.sh"
-                  className="inline-flex items-center justify-center px-6 py-3.5 bg-gradient-to-r from-purple-600 to-indigo-700 text-white font-medium rounded-xl hover:opacity-90 transition-opacity w-full mb-4"
+                  className="inline-flex items-center justify-center px-6 py-3.5 bg-gradient-to-r from-purple-600 to-indigo-700 text-white font-medium rounded-xl hover:opacity-90 transition-opacity w-full mb-4 cursor-pointer"
                >
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
                      <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
