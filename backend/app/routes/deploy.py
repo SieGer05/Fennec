@@ -9,8 +9,11 @@ router = APIRouter(prefix="/deploy", tags=["Deploy"])
 
 @router.post("/", response_model=AgentCredential)
 def create_agent_credential(agent: AgentCredentialCreate, db: Session = Depends(get_db)):
+    clean_ip = agent.ip.replace(".", "")  
+    generated_name = f"Agent-{clean_ip}"
+
     db_agent = AgentCredentialModel(
-        nom=agent.nom,
+        nom=generated_name,  
         ip=agent.ip,
         port=agent.port,
         username=agent.username,
@@ -72,9 +75,26 @@ def refresh_agent_status(agent_id: int, db: Session = Depends(get_db)):
         _, stdout, _ = ssh.exec_command("id")
         result = stdout.read().decode().strip()
 
-        if result:  
+        if result:
             agent.status = "active"
-            agent.nom = "connected"
+            _, stdout, _ = ssh.exec_command("cat /home/fennec_user/analysis/static_info.txt")
+            file_content = stdout.read().decode().strip()
+
+            lines = file_content.splitlines()
+            try:
+                vpn_index = lines.index("VPN Actif") + 1
+                version_index = lines.index("Version Logiciel") + 1
+                os_index = lines.index("Système d exploitation") + 1
+                last_conn_index = lines.index("Dernière connexion") + 1
+
+                agent.vpn_actif = lines[vpn_index].strip()
+                agent.version = lines[version_index].strip()
+                agent.os = lines[os_index].strip()
+                agent.last_connection = lines[last_conn_index].strip()
+
+            except ValueError:
+                print("Could not parse static_info.txt: missing expected labels")
+
         else:
             agent.status = "pending"
 
@@ -87,4 +107,11 @@ def refresh_agent_status(agent_id: int, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(agent)
 
+    return agent
+
+@router.get("/{agent_id}", response_model=AgentCredential)
+def get_agent(agent_id: int, db: Session = Depends(get_db)):
+    agent = db.query(AgentCredentialModel).filter(AgentCredentialModel.id == agent_id).first()
+    if not agent:
+        raise HTTPException(status_code=404, detail="Agent not found")
     return agent

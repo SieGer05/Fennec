@@ -13,6 +13,8 @@ class AgentCredentialBase(BaseModel):
    status: str = "pending"
    os: str = "Not connected"
    version: str = "not connected"
+   vpn_actif: str = "non"           # "oui" or "non"
+   last_connection: str = "N/A"
 
 class AgentCredentialCreate(AgentCredentialBase):
    pass

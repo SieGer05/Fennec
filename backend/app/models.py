@@ -20,3 +20,5 @@ class AgentCredential(Base):
    status = Column(String, default="pending") 
    os = Column(String, default="Not connected")
    version = Column(String, default="Not connected")
+   vpn_actif = Column(String, default="non")     
+   last_connection = Column(String, default="N/A")
