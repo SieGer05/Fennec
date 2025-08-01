@@ -115,3 +115,35 @@ def get_agent(agent_id: int, db: Session = Depends(get_db)):
     if not agent:
         raise HTTPException(status_code=404, detail="Agent not found")
     return agent
+
+@router.get("/metrics/{agent_id}")
+def get_agent_metrics(agent_id: int, db: Session = Depends(get_db)):
+    agent = db.query(AgentCredentialModel).filter(AgentCredentialModel.id == agent_id).first()
+    if not agent:
+        raise HTTPException(status_code=404, detail="Agent not found")
+
+    try:
+        ssh = paramiko.SSHClient()
+        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        ssh.connect(
+            hostname=agent.ip,
+            port=agent.port,
+            username=agent.username,
+            password=agent.password,
+            timeout=5
+        )
+
+        _, stdout, _ = ssh.exec_command("cat /home/fennec_user/analysis/system_metrics.txt")
+        output = stdout.read().decode().strip().splitlines()
+
+        metrics = {
+            "cpu": output[1] if len(output) > 1 else "N/A",
+            "memory": output[3] if len(output) > 3 else "N/A",
+            "disk": output[5] if len(output) > 5 else "N/A",
+            "uptime": output[7] if len(output) > 7 else "N/A"
+        }
+
+        ssh.close()
+        return metrics
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Erreur SSH : {e}")
