@@ -23,7 +23,7 @@ const AgentsPieChart = ({ data }) => {
             </PieChart>
             <div className="absolute inset-0 flex items-center justify-center">
                <p className="text-center text-gray-500 text-sm font-medium">
-               No agent data
+               Aucune donnée d'agent
                </p>
             </div>
          </div>
