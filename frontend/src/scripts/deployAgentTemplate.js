@@ -98,45 +98,38 @@ sudo -u $TEMP_USER bash -c '
     echo "\$OS_NAME" >> "'$STATIC_INFO_FILE'"
     echo "Adresse IP Privée" >> "'$STATIC_INFO_FILE'"
     echo "\$PRIVATE_IP" >> "'$STATIC_INFO_FILE'"
+    echo "Dernière connexion" >> "'$STATIC_INFO_FILE'"   # <-- ADDED
+    echo "Aucune connexion" >> "'$STATIC_INFO_FILE'"     # <-- ADDED
 '
 
 # Script de surveillance des métriques
 echo "[INFO] Création du script de surveillance..."
 sudo -u $TEMP_USER tee "$ANALYSIS_DIR/monitor_metrics.sh" >/dev/null <<'EOF'
 #!/bin/bash
-METRICS_FILE="\$HOME/analysis/system_metrics.txt"
-LAST_LOGIN_FILE="\$HOME/analysis/last_login.txt"
+METRICS_FILE="$HOME/analysis/system_metrics.txt"
 
-CPU_USAGE=\$(top -bn1 | grep "Cpu(s)" | sed "s/.*, *\\([0-9.]*\\)%* id.*/\\1/" | awk '{print 100 - \$1}')
-CPU_USAGE=\$(printf "%.1f" "\$CPU_USAGE")
+CPU_USAGE=$(top -bn1 | grep "Cpu(s)" | sed "s/.*, *\([0-9.]*\)%* id.*/\\1/" | awk '{print 100 - $1}')
+CPU_USAGE=$(printf "%.1f" "$CPU_USAGE")
 
-MEM_TOTAL=\$(free -m | awk '/Mem:/ {print \$2}')
-MEM_USED=\$(free -m | awk '/Mem:/ {print \$3}')
-MEM_USED_GB=\$(echo "scale=1; \$MEM_USED/1024" | bc)
-MEM_TOTAL_GB=\$(echo "scale=1; \$MEM_TOTAL/1024" | bc)
+MEM_TOTAL=$(free -m | awk '/Mem:/ {print $2}')
+MEM_USED=$(free -m | awk '/Mem:/ {print $3}')
+MEM_USED_GB=$(echo "scale=1; $MEM_USED/1024" | bc)
+MEM_TOTAL_GB=$(echo "scale=1; $MEM_TOTAL/1024" | bc)
 
-DISK_INFO=\$(df -BG / | awk 'NR==2 {print \$4, \$2}' | tr -d 'G')
-DISK_FREE=\$(echo \$DISK_INFO | awk '{print \$1}')
-DISK_TOTAL=\$(echo \$DISK_INFO | awk '{print \$2}')
+DISK_INFO=$(df -BG / | awk 'NR==2 {print $4, $2}' | tr -d 'G')
+DISK_FREE=$(echo $DISK_INFO | awk '{print $1}')
+DISK_TOTAL=$(echo $DISK_INFO | awk '{print $2}')
 
-UPTIME=\$(uptime -p | sed 's/up //')
+UPTIME=$(uptime -p | sed 's/up //')
 
-if [ -f "\$LAST_LOGIN_FILE" ]; then
-    LAST_LOGIN=\$(cat "\$LAST_LOGIN_FILE")
-else
-    LAST_LOGIN="Aucune connexion"
-fi
-
-echo "Utilisation du CPU" > \$METRICS_FILE
-echo "\${CPU_USAGE}%" >> \$METRICS_FILE
-echo "Utilisation de la mémoire" >> \$METRICS_FILE
-echo "\${MEM_USED_GB} Go sur \${MEM_TOTAL_GB} Go" >> \$METRICS_FILE
-echo "Espace disque libre" >> \$METRICS_FILE
-echo "\${DISK_FREE} Go / \${DISK_TOTAL} Go" >> \$METRICS_FILE
-echo "Temps de fonctionnement (uptime)" >> \$METRICS_FILE
-echo "\$UPTIME" >> \$METRICS_FILE
-echo "Dernière connexion" >> \$METRICS_FILE
-echo "\$LAST_LOGIN" >> \$METRICS_FILE
+echo "Utilisation du CPU" > $METRICS_FILE
+echo "\${CPU_USAGE}%" >> $METRICS_FILE
+echo "Utilisation de la mémoire" >> $METRICS_FILE
+echo "\${MEM_USED_GB} Go sur \${MEM_TOTAL_GB} Go" >> $METRICS_FILE
+echo "Espace disque libre" >> $METRICS_FILE
+echo "\${DISK_FREE} Go / \${DISK_TOTAL} Go" >> $METRICS_FILE
+echo "Temps de fonctionnement (uptime)" >> $METRICS_FILE
+echo "$UPTIME" >> $METRICS_FILE
 EOF
 
 sudo chmod +x "$ANALYSIS_DIR/monitor_metrics.sh"
@@ -146,7 +139,8 @@ echo "[INFO] Configuration du suivi des connexions SSH..."
 sudo -u $TEMP_USER tee "/home/$TEMP_USER/.bash_profile" >/dev/null <<'EOF'
 #!/bin/bash
 if [ -n "$SSH_CONNECTION" ]; then
-    echo "$(date '+%Y-%m-%d %H:%M:%S')" > "$HOME/analysis/last_login.txt"
+    # Update last login in static info
+    sed -i '/^Dernière connexion$/{n;s/.*/'"$(date '+%Y-%m-%d %H:%M:%S')"'/}' "$HOME/analysis/static_info.txt"
     $HOME/analysis/monitor_metrics.sh
 fi
 EOF
