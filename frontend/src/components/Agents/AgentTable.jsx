@@ -38,7 +38,7 @@ function AgentTable({ agent, onDelete }) {
             <tbody className="divide-y divide-gray-200">
                <tr className="hover:bg-gray-50/80 transition-colors">
                <td className="py-4 text-gray-900">{agent.id}</td>
-               <td className="py-4 font-light">{agent.name}</td>
+               <td className="py-4 text-gray-600 font-mono">{agent.nom}</td>
                <td className="py-4 text-gray-600 font-mono">{agent.ip}</td>
                <td className="py-4 text-gray-600 font-mono">{agent.os}</td>
                <td className="py-4 text-gray-600">{agent.version}</td>
@@ -47,9 +47,9 @@ function AgentTable({ agent, onDelete }) {
                   <span
                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
                      ${
-                     agent.status === "Actif"
+                     agent.status === "active"
                         ? "text-green-700 bg-green-50 ring-1 ring-green-200"
-                        : agent.status === "En attente"
+                        : agent.status === "pending"
                         ? "text-amber-700 bg-amber-50 ring-1 ring-amber-200"
                         : "text-rose-700 bg-rose-50 ring-1 ring-rose-200"
                      }

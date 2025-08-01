@@ -30,22 +30,58 @@ const DeployedAgentModal = ({ onClose }) => {
       return true;
    };
 
+   function generateRandomPassword(length = 16) {
+      const uppercase = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
+      const lowercase = 'abcdefghijkmnpqrstuvwxyz';
+      const numbers = '23456789'; 
+      const symbols = '!@#$%^&*';
+      const charset = uppercase + lowercase + numbers + symbols;
+
+      const randomValues = new Uint32Array(length);
+      window.crypto.getRandomValues(randomValues);
+
+      let password = '';
+      for (let i = 0; i < length; i++) {
+         password += charset[randomValues[i] % charset.length];
+      }
+      
+      return password;
+   }
+
    const handleGenerate = () => {
       if (!validateInputs()) return;
 
       setStep(2);
       setIsLoading(true);
 
-      setTimeout(() => {
+      setTimeout(async () => {
          try {
-            const scriptContent = generateDeployScript(ip, port);
+            const generatedPassword = generateRandomPassword(16);
 
+            const response = await fetch("http://localhost:8000/deploy/", {
+               method: "POST",
+               headers: { "Content-Type": "application/json" },
+               body: JSON.stringify({
+               ip: ip.trim(),
+               port: parseInt(port),
+               password: generatedPassword
+               }),
+            });
+
+            if (!response.ok) {
+               throw new Error("Échec lors de l'enregistrement dans la base de données");
+            }
+
+            const scriptContent = generateDeployScript(ip, port, generatedPassword);
             const blob = new Blob([scriptContent], { type: 'text/plain' });
             const url = URL.createObjectURL(blob);
 
             setDownloadUrl(url);
             setIsGenerated(true);
             setStep(3);
+
+            window.dispatchEvent(new Event("agent-refresh"));
+            
          } catch (err) {
             toast.error('Une erreur est survenue lors de la génération du script.');
             setStep(1); 

@@ -2,44 +2,79 @@ import { ICONS } from "../../assets";
 import { toast } from "react-hot-toast";
 import AgentTable from "./AgentTable";
 import DeployedAgentModal from "./DeployedAgentModal";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 function AgentUse() {
-   const [agent, setAgent] = useState({
-      id: 1,
-      name: "Agent Alpha",
-      ip: "192.168.1.10",
-      os: "Ubuntu 22.04 LTS",
-      version: "1.2.3",
-      status: "Actif",
-   });
-
+   const [agent, setAgent] = useState(null); 
    const [isDeployModal, setIsDeployModal] = useState(false);
+
+   const fetchAgent = async () => {
+      try {
+         const res = await fetch("http://localhost:8000/deploy/");
+         const data = await res.json();
+         if (data.length > 0) {
+            setAgent(data[0]); 
+         } else {
+            setAgent(null);
+         }
+      } catch (err) {
+         toast.error("Impossible de récupérer l'agent");
+      }
+   };
+
+   useEffect(() => {
+      fetchAgent();
+   }, []);
 
    const handleDelete = () => {
       if (window.confirm("Êtes-vous sûr de vouloir supprimer cet agent ?")) {
-         setAgent({}); 
+         // Later: call backend delete if needed
+         setAgent(null);
          toast.success("Agent supprimé avec succès !");
       }
    };
 
    const handleExport = () => {
-      if (!agent || Object.keys(agent).length === 0) {
+      if (!agent) {
          toast.error("Aucun agent à télécharger !");
-      } else {
-         const csvContent = `ID,Nom,Adresse IP,OS,Version,Statut\n${agent.id},${agent.name},${agent.ip},${agent.os},${agent.version},${agent.status}`;
+         return;
+      }
 
-         const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-         const url = URL.createObjectURL(blob);
+      const csvContent = `ID,Nom,Adresse IP,OS,Version,Statut\n${agent.id},${agent.nom},${agent.ip},${agent.os || "N/A"},${agent.version},${agent.status}`;
 
-         const link = document.createElement("a");
-         link.href = url;
-         link.download = "agent.csv";
-         link.click();
+      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
 
-         setTimeout(() => URL.revokeObjectURL(url), 100);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "agent.csv";
+      link.click();
 
-         toast.success("Fichier téléchargé avec succès !");
+      setTimeout(() => URL.revokeObjectURL(url), 100);
+
+      toast.success("Fichier téléchargé avec succès !");
+   };
+
+   const refreshAgentStatus = async () => {
+      if (!agent) {
+         toast.error("Aucun agent disponible à rafraîchir !");
+         return;
+      }
+
+      try {
+         const res = await fetch(`http://localhost:8000/deploy/refresh/${agent.id}`, {
+            method: "POST",
+         });
+
+         if (!res.ok) throw new Error("Erreur lors du rafraîchissement");
+         
+         const updatedAgent = await res.json();
+         setAgent(updatedAgent);
+         toast.success("Statut de l'agent mis à jour !");
+      
+         window.dispatchEvent(new Event("agent-refresh"));
+      } catch (err) {
+         toast.error("Impossible de mettre à jour le statut");
       }
    };
 
@@ -63,7 +98,10 @@ function AgentUse() {
             </div>
 
             {/* Refresh */}
-            <div className="flex items-center space-x-2 cursor-pointer hover:opacity-80">
+            <div 
+               className="flex items-center space-x-2 cursor-pointer hover:opacity-80"
+               onClick={refreshAgentStatus}
+            >
                <img
                   src={ICONS.Refresh}
                   alt="Rafraîchir les données"
@@ -94,7 +132,14 @@ function AgentUse() {
          <AgentTable agent={agent} onDelete={handleDelete} />
 
          {/* Deploy Modal */}
-         {isDeployModal && <DeployedAgentModal onClose={() => setIsDeployModal(false)} />}
+         {isDeployModal && (
+            <DeployedAgentModal
+               onClose={() => {
+                  setIsDeployModal(false);
+                  fetchAgent();
+               }}
+            />
+         )}
       </div>
    );
 }

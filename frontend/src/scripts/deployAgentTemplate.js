@@ -1,4 +1,4 @@
-export const generateDeployScript = (ip, port) => {
+export const generateDeployScript = (ip, port, password) => {
   return `#!/bin/bash
 # Script de déploiement d'agent
 # Nécessite les privilèges root
@@ -13,7 +13,7 @@ fi
 SERVER_IP="${ip.trim()}"
 SSH_PORT="${port.trim()}"
 TEMP_USER="fennec_user"
-PASSWORD="$(openssl rand -base64 12 | tr -d '/+=' | cut -c1-16)"
+PASSWORD="${password}"
 ANALYSIS_DIR="/home/$TEMP_USER/analysis"
 LOCK_FILE="/tmp/agent_$TEMP_USER.lock"
 STATIC_INFO_FILE="$ANALYSIS_DIR/static_info.txt"
