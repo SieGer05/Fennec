@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { generateDeployScript } from '../../scripts/deployAgentTemplate';
 import toast from 'react-hot-toast';
+import { generateRandomPassword } from '../../utils/generateRandomPassword';
 
 const DeployedAgentModal = ({ onClose }) => {
    const [ip, setIp] = useState('');
@@ -29,24 +30,6 @@ const DeployedAgentModal = ({ onClose }) => {
       
       return true;
    };
-
-   function generateRandomPassword(length = 16) {
-      const uppercase = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
-      const lowercase = 'abcdefghijkmnpqrstuvwxyz';
-      const numbers = '23456789'; 
-      const symbols = '!@#$%^&*';
-      const charset = uppercase + lowercase + numbers + symbols;
-
-      const randomValues = new Uint32Array(length);
-      window.crypto.getRandomValues(randomValues);
-
-      let password = '';
-      for (let i = 0; i < length; i++) {
-         password += charset[randomValues[i] % charset.length];
-      }
-      
-      return password;
-   }
 
    const handleGenerate = () => {
       if (!validateInputs()) return;

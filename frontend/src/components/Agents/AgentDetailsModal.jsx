@@ -15,7 +15,7 @@ function AgentDetailsModal({ agent, onClose }) {
 
          <div className="space-y-3 text-sm text-gray-700">
             <p><span className="font-medium">ID :</span> {agent.id}</p>
-            <p><span className="font-medium">Nom :</span> {agent.name}</p>
+            <p><span className="font-medium">Nom :</span> {agent.nom}</p>
             <p><span className="font-medium">Adresse IP :</span> {agent.ip}</p>
             <p><span className="font-medium">Système d'exploitation :</span> {agent.os}</p>
             <p><span className="font-medium">Version :</span> {agent.version}</p>
@@ -23,7 +23,7 @@ function AgentDetailsModal({ agent, onClose }) {
             <span className="font-medium">Statut :</span>{" "}
             <span
                className={`px-2 py-0.5 rounded-full text-xs font-medium ${
-                  agent.status === "Actif"
+                  agent.status === "active"
                   ? "text-green-700 bg-green-50 ring-1 ring-green-200"
                   : agent.status === "En attente"
                   ? "text-amber-700 bg-amber-50 ring-1 ring-amber-200"

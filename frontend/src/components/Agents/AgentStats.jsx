@@ -13,6 +13,7 @@ const performances = [
 
 function AgentStats() {
    const [statusData, setStatusData] = useState([]);
+   const [agentDetails, setAgentDetails] = useState(null);
 
    const fetchStatus = async () => {
       try {
@@ -25,11 +26,25 @@ function AgentStats() {
       }
    };
 
+   const fetchAgentDetails = async (agentId = 1) => {
+      try {
+         const res = await fetch(`http://localhost:8000/deploy/${agentId}`);
+         if (!res.ok) throw new Error("Erreur lors de la récupération des détails de l'agent");
+         const data = await res.json();
+         setAgentDetails(data);
+      } catch (err) {
+         toast.error("Impossible de récupérer les détails de l'agent");
+      }
+   };
+
    useEffect(() => {
       fetchStatus();
+      fetchAgentDetails();
 
-      const handleRefreshEvent = () => {
+      const handleRefreshEvent = (event) => {
+         const agentId = event?.detail || 1;
          fetchStatus();
+         fetchAgentDetails(agentId);
       };
 
       window.addEventListener("agent-refresh", handleRefreshEvent);
@@ -43,42 +58,53 @@ function AgentStats() {
       <div className="mt-10 flex space-x-6 h-65">
          {/* Pie Chart Section */}
          <div className="flex-2 border border-purple-300 ml-6 rounded-sm relative shadow-sm">
-            <h2 className="absolute -top-3 left-1/2 -translate-x-1/2 
-            bg-white px-3 text-purple-700 text-md font-semibold 
-            border py-0.5 rounded-2xl border-purple-300 ">
+            <h2
+               className="absolute -top-3 left-1/2 -translate-x-1/2 
+               bg-white px-3 text-purple-700 text-md font-semibold 
+               border py-0.5 rounded-2xl border-purple-300 "
+            >
                Statut d'Agent
             </h2>
-            
-            {/* Pass real API data */}
+
             <AgentPieChart data={statusData} />
          </div>
-         
+
          {/* Agent Details Section */}
          <div className="flex-3 border border-purple-300 rounded-sm relative h-50 mt-7 shadow-sm">
-            <h2 className="absolute -top-3 left-1/2 -translate-x-1/2 
-            bg-white px-3 text-purple-700 text-md font-semibold 
-            border py-0.5 rounded-2xl border-purple-300 ">
+            <h2
+               className="absolute -top-3 left-1/2 -translate-x-1/2 
+               bg-white px-3 text-purple-700 text-md font-semibold 
+               border py-0.5 rounded-2xl border-purple-300 "
+            >
                Detail de l'Agent
             </h2>
 
-            <div className="flex font-roboto mt-13 space-x-15 justify-center text-sm ">
-               <StatCard title={"Addresse IP"} value={"192.168.8.1"} />
-               <StatCard title={"VPN Actif"} value={"Non"} />
-               <StatCard title={"Version Logiciel"} value={"v2.1.0"} />
-               <StatCard title={"Dernière connexion"} value={"5 minutes ago"} />
-            </div>  
+            {agentDetails ? (
+               <>
+                  <div className="flex font-roboto mt-13 space-x-15 justify-center text-sm ">
+                     <StatCard title={"Addresse IP"} value={agentDetails.ip} />
+                     <StatCard title={"VPN Actif"} value={agentDetails.vpn_actif || "Non"} />
+                     <StatCard title={"Version Logiciel"} value={agentDetails.version} />
+                     <StatCard title={"Dernière connexion"} value={agentDetails.last_connection} />
+                  </div>
 
-            <div className="flex font-roboto mt-9 ml-9 space-x-25 text-sm ">
-               <StatCard title={"Système d'exploitation"} value={"Ubuntu 22.04 LTS"} isBottom={true}/>
-               <StatCard title={"Nom de l'Agent"} value={"Agent Serveur – Casablanca"} isBottom={true} />
-            </div>
+                  <div className="flex font-roboto mt-9 ml-5 space-x-13 text-sm ">
+                     <StatCard title={"Système d'exploitation"} value={agentDetails.os} isBottom={true} />
+                     <StatCard title={"Nom de l'Agent"} value={agentDetails.nom} isBottom={true} />
+                  </div>
+               </>
+            ) : (
+               <p className="text-center mt-10 text-gray-400">Chargement des détails de l'agent...</p>
+            )}
          </div>
-         
+
          {/* Performance Section */}
          <div className="flex-2 border border-purple-300 mr-6 rounded-sm relative shadow-sm">
-            <h2 className="absolute -top-3 left-1/2 -translate-x-1/2 
-            bg-white px-3 text-purple-700 text-md font-semibold 
-            border py-0.5 rounded-2xl border-purple-300 ">
+            <h2
+               className="absolute -top-3 left-1/2 -translate-x-1/2 
+               bg-white px-3 text-purple-700 text-md font-semibold 
+               border py-0.5 rounded-2xl border-purple-300 "
+            >
                Performances
             </h2>
 

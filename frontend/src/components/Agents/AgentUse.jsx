@@ -72,7 +72,7 @@ function AgentUse() {
          setAgent(updatedAgent);
          toast.success("Statut de l'agent mis à jour !");
       
-         window.dispatchEvent(new Event("agent-refresh"));
+         window.dispatchEvent(new CustomEvent("agent-refresh", { detail: agent.id }));
       } catch (err) {
          toast.error("Impossible de mettre à jour le statut");
       }
