@@ -11,6 +11,8 @@ const DeployedAgentModal = ({ onClose }) => {
    const [downloadUrl, setDownloadUrl] = useState('');
    const [step, setStep] = useState(1);
 
+   const IPV4_REGEX = /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
+
    useEffect(() => {
       if (downloadUrl) {
          return () => URL.revokeObjectURL(downloadUrl);
@@ -18,17 +20,37 @@ const DeployedAgentModal = ({ onClose }) => {
    }, [downloadUrl]);
 
    const validateInputs = () => {
-      if (!ip.trim()) {
+      const trimmedIp = ip.trim();
+      
+      if (!trimmedIp) {
          toast.error("Veuillez saisir une adresse IP valide");
          return false;
       }
       
-      if (!port || parseInt(port) < 1 || parseInt(port) > 65535) {
+      if (!IPV4_REGEX.test(trimmedIp)) {
+         toast.error("Format d'adresse IP invalide. Exemple: 192.168.1.100");
+         return false;
+      }
+      
+      const portNum = parseInt(port, 10);
+      if (isNaN(portNum)) {
+         toast.error("Veuillez saisir un numéro de port valide");
+         return false;
+      }
+      
+      if (portNum < 1 || portNum > 65535) {
          toast.error("Veuillez saisir un numéro de port valide (1-65535)");
          return false;
       }
       
       return true;
+   };
+
+   const handlePortChange = (e) => {
+      const value = e.target.value;
+      if (value === '' || /^\d+$/.test(value)) {
+         setPort(value);
+      }
    };
 
    const handleGenerate = () => {
@@ -139,9 +161,9 @@ const DeployedAgentModal = ({ onClose }) => {
                         Port SSH
                      </label>
                      <input
-                        type="number"
+                        type="text"
                         value={port}
-                        onChange={(e) => setPort(e.target.value)}
+                        onChange={handlePortChange}
                         className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                         min="1"
                         max="65535"
