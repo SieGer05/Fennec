@@ -4,16 +4,10 @@ import StatCard from "./StatCard";
 import PerformanceList from "./PerformanceList";
 import { toast } from "react-hot-toast";
 
-const performances = [
-   { label: "Utilisation du CPU", value: "28 %" },
-   { label: "Utilisation de la mémoire", value: "3.2 Go sur 8 Go" },
-   { label: "Espace disque libre", value: "150 Go / 500 Go" },
-   { label: "Temps de fonctionnement (uptime)", value: "5 jours, 12 heures" },
-];
-
 function AgentStats() {
    const [statusData, setStatusData] = useState([]);
    const [agentDetails, setAgentDetails] = useState(null);
+   const [performances, setPerformances] = useState([]);
 
    const fetchStatus = async () => {
       try {
@@ -37,18 +31,36 @@ function AgentStats() {
       }
    };
 
+   const fetchAgentMetrics = async (agentId = 1) => {
+      try {
+         const res = await fetch(`http://localhost:8000/deploy/metrics/${agentId}`);
+         if (!res.ok) throw new Error("Erreur lors de la récupération des métriques");
+         const data = await res.json();
+
+         setPerformances([
+            { label: "Utilisation du CPU", value: data.cpu },
+            { label: "Utilisation de la mémoire", value: data.memory },
+            { label: "Espace disque libre", value: data.disk },
+            { label: "Temps de fonctionnement (uptime)", value: data.uptime },
+         ]);
+      } catch (err) {
+         toast.error("Impossible de récupérer les performances de l'agent");
+      }
+   };
+
    useEffect(() => {
       fetchStatus();
       fetchAgentDetails();
+      fetchAgentMetrics();
 
       const handleRefreshEvent = (event) => {
          const agentId = event?.detail || 1;
          fetchStatus();
          fetchAgentDetails(agentId);
+         fetchAgentMetrics(agentId);
       };
 
       window.addEventListener("agent-refresh", handleRefreshEvent);
-
       return () => {
          window.removeEventListener("agent-refresh", handleRefreshEvent);
       };
@@ -58,11 +70,9 @@ function AgentStats() {
       <div className="mt-10 flex space-x-6 h-65">
          {/* Pie Chart Section */}
          <div className="flex-2 border border-purple-300 ml-6 rounded-sm relative shadow-sm">
-            <h2
-               className="absolute -top-3 left-1/2 -translate-x-1/2 
+            <h2 className="absolute -top-3 left-1/2 -translate-x-1/2 
                bg-white px-3 text-purple-700 text-md font-semibold 
-               border py-0.5 rounded-2xl border-purple-300 "
-            >
+               border py-0.5 rounded-2xl border-purple-300 ">
                Statut d'Agent
             </h2>
 
@@ -71,11 +81,9 @@ function AgentStats() {
 
          {/* Agent Details Section */}
          <div className="flex-3 border border-purple-300 rounded-sm relative h-50 mt-7 shadow-sm">
-            <h2
-               className="absolute -top-3 left-1/2 -translate-x-1/2 
+            <h2 className="absolute -top-3 left-1/2 -translate-x-1/2 
                bg-white px-3 text-purple-700 text-md font-semibold 
-               border py-0.5 rounded-2xl border-purple-300 "
-            >
+               border py-0.5 rounded-2xl border-purple-300 ">
                Detail de l'Agent
             </h2>
 
@@ -100,11 +108,9 @@ function AgentStats() {
 
          {/* Performance Section */}
          <div className="flex-2 border border-purple-300 mr-6 rounded-sm relative shadow-sm">
-            <h2
-               className="absolute -top-3 left-1/2 -translate-x-1/2 
+            <h2 className="absolute -top-3 left-1/2 -translate-x-1/2 
                bg-white px-3 text-purple-700 text-md font-semibold 
-               border py-0.5 rounded-2xl border-purple-300 "
-            >
+               border py-0.5 rounded-2xl border-purple-300 ">
                Performances
             </h2>
 
