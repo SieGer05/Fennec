@@ -54,47 +54,52 @@ const DeployedAgentModal = ({ onClose }) => {
    };
 
    const handleGenerate = () => {
-      if (!validateInputs()) return;
+   if (!validateInputs()) return;
 
-      setStep(2);
-      setIsLoading(true);
+   setStep(2);
+   setIsLoading(true);
 
-      setTimeout(async () => {
-         try {
-            const generatedPassword = generateRandomPassword(16);
+   setTimeout(async () => {
+      try {
+         const generatedPassword = generateRandomPassword(16);
 
-            const response = await fetch("http://localhost:8000/deploy/", {
-               method: "POST",
-               headers: { "Content-Type": "application/json" },
-               body: JSON.stringify({
+         const response = await fetch("http://localhost:8000/deploy/", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
                ip: ip.trim(),
                port: parseInt(port),
                password: generatedPassword
-               }),
-            });
+            }),
+         });
 
-            if (!response.ok) {
-               throw new Error("Échec lors de l'enregistrement dans la base de données");
-            }
-
-            const scriptContent = generateDeployScript(ip, port, generatedPassword);
-            const blob = new Blob([scriptContent], { type: 'text/plain' });
-            const url = URL.createObjectURL(blob);
-
-            setDownloadUrl(url);
-            setIsGenerated(true);
-            setStep(3);
-
-            window.dispatchEvent(new Event("agent-refresh"));
-            
-         } catch (err) {
-            toast.error('Une erreur est survenue lors de la génération du script.');
-            setStep(1); 
-         } finally {
-            setIsLoading(false);
+         if (!response.ok) {
+            throw new Error("Échec lors de l'enregistrement dans la base de données");
          }
-      }, 3000);
-   };
+
+         // Get the newly created agent data (including its id)
+         const newAgent = await response.json();
+
+         const scriptContent = generateDeployScript(ip, port, generatedPassword);
+         const blob = new Blob([scriptContent], { type: 'text/plain' });
+         const url = URL.createObjectURL(blob);
+
+         setDownloadUrl(url);
+         setIsGenerated(true);
+         setStep(3);
+
+         // Dispatch event with the new agent ID so other components can refresh correctly
+         window.dispatchEvent(new CustomEvent("agent-refresh", { detail: newAgent.id }));
+
+      } catch (err) {
+         toast.error('Une erreur est survenue lors de la génération du script.');
+         setStep(1);
+      } finally {
+         setIsLoading(false);
+      }
+   }, 3000);
+};
+
 
    return (
       <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">

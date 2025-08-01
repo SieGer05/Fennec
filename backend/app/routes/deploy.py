@@ -147,3 +147,14 @@ def get_agent_metrics(agent_id: int, db: Session = Depends(get_db)):
         return metrics
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Erreur SSH : {e}")
+    
+@router.delete("/{agent_id}")
+def delete_agent(agent_id: int, db: Session = Depends(get_db)):
+    agent = db.query(AgentCredentialModel).filter(AgentCredentialModel.id == agent_id).first()
+    if not agent:
+        raise HTTPException(status_code=404, detail="Agent not found")
+
+    db.delete(agent)
+    db.commit()
+    return {"message": "Agent supprimé avec succès"}
+

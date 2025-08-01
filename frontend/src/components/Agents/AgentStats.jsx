@@ -20,7 +20,7 @@ function AgentStats() {
       }
    };
 
-   const fetchAgentDetails = async (agentId = 1) => {
+   const fetchAgentDetails = async (agentId) => {
       try {
          const res = await fetch(`http://localhost:8000/deploy/${agentId}`);
          if (!res.ok) throw new Error("Erreur lors de la récupération des détails de l'agent");
@@ -31,7 +31,7 @@ function AgentStats() {
       }
    };
 
-   const fetchAgentMetrics = async (agentId = 1) => {
+   const fetchAgentMetrics = async (agentId) => {
       try {
          const res = await fetch(`http://localhost:8000/deploy/metrics/${agentId}`);
          if (!res.ok) throw new Error("Erreur lors de la récupération des métriques");
@@ -54,7 +54,15 @@ function AgentStats() {
       fetchAgentMetrics();
 
       const handleRefreshEvent = (event) => {
-         const agentId = event?.detail || 1;
+         const agentId = event?.detail;
+
+         if (!agentId) {
+            setStatusData([]);
+            setAgentDetails(null);
+            setPerformances([]);
+            return;
+         }
+
          fetchStatus();
          fetchAgentDetails(agentId);
          fetchAgentMetrics(agentId);
@@ -102,7 +110,7 @@ function AgentStats() {
                   </div>
                </>
             ) : (
-               <p className="text-center mt-10 text-gray-400">Chargement des détails de l'agent...</p>
+               <p className="text-center mt-20 text-gray-400 italic">Aucun agent disponible</p>
             )}
          </div>
 

@@ -1,4 +1,12 @@
 function PerformanceList({ performances }) {
+   if (!performances || performances.length === 0) {
+      return (
+         <div className="p-5 text-center text-gray-400 mt-23 italic">
+            Aucune donnée de performance disponible.
+         </div>
+      );
+   }
+
    return (
       <div className="overflow-hidden mt-2">
          <div className="p-5">

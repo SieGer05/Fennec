@@ -26,11 +26,25 @@ function AgentUse() {
       fetchAgent();
    }, []);
 
-   const handleDelete = () => {
-      if (window.confirm("Êtes-vous sûr de vouloir supprimer cet agent ?")) {
-         // Later: call backend delete if needed
+   const handleDelete = async () => {
+      if (!agent) return;
+
+      const confirmDelete = window.confirm("Êtes-vous sûr de vouloir supprimer cet agent ?");
+      if (!confirmDelete) return;
+
+      try {
+         const res = await fetch(`http://localhost:8000/deploy/${agent.id}`, {
+            method: "DELETE",
+         });
+
+         if (!res.ok) throw new Error("Erreur lors de la suppression");
+
          setAgent(null);
          toast.success("Agent supprimé avec succès !");
+
+         window.dispatchEvent(new CustomEvent("agent-refresh", { detail: null }));
+      } catch (err) {
+         toast.error("Erreur lors de la suppression de l'agent");
       }
    };
 
