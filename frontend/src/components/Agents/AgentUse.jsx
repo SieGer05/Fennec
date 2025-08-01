@@ -2,160 +2,123 @@ import { ICONS } from "../../assets";
 import { toast } from "react-hot-toast";
 import AgentTable from "./AgentTable";
 import DeployedAgentModal from "./DeployedAgentModal";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
-function AgentUse() {
-   const [agent, setAgent] = useState(null); 
-   const [isDeployModal, setIsDeployModal] = useState(false);
+function AgentUse({ agent, onAgentChange, onRefresh }) {
+  const [isDeployModal, setIsDeployModal] = useState(false);
 
-   const fetchAgent = async () => {
-      try {
-         const res = await fetch("http://localhost:8000/deploy/");
-         const data = await res.json();
-         if (data.length > 0) {
-            setAgent(data[0]); 
-         } else {
-            setAgent(null);
-         }
-      } catch (err) {
-         toast.error("Impossible de récupérer l'agent");
-      }
-   };
+  const handleDelete = async () => {
+    if (!agent) return;
 
-   useEffect(() => {
-      fetchAgent();
-   }, []);
+    const confirmDelete = window.confirm("Are you sure you want to delete this agent?");
+    if (!confirmDelete) return;
 
-   const handleDelete = async () => {
-      if (!agent) return;
+    try {
+      const res = await fetch(`http://localhost:8000/deploy/${agent.id}`, {
+        method: "DELETE",
+      });
 
-      const confirmDelete = window.confirm("Êtes-vous sûr de vouloir supprimer cet agent ?");
-      if (!confirmDelete) return;
+      if (!res.ok) throw new Error("Failed to delete agent");
 
-      try {
-         const res = await fetch(`http://localhost:8000/deploy/${agent.id}`, {
-            method: "DELETE",
-         });
+      onAgentChange(null);
+      toast.success("Agent deleted successfully!");
+      onRefresh(null);
+    } catch (err) {
+      toast.error("Failed to delete agent");
+    }
+  };
 
-         if (!res.ok) throw new Error("Erreur lors de la suppression");
+  const handleExport = () => {
+    if (!agent) {
+      toast.error("No agent to export!");
+      return;
+    }
 
-         setAgent(null);
-         toast.success("Agent supprimé avec succès !");
+    const csvContent = `ID,Name,IP Address,OS,Version,Status\n${agent.id},${agent.nom},${agent.ip},${agent.os || "N/A"},${agent.version},${agent.status}`;
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
 
-         window.dispatchEvent(new CustomEvent("agent-refresh", { detail: null }));
-      } catch (err) {
-         toast.error("Erreur lors de la suppression de l'agent");
-      }
-   };
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "agent.csv";
+    link.click();
 
-   const handleExport = () => {
-      if (!agent) {
-         toast.error("Aucun agent à télécharger !");
-         return;
-      }
+    setTimeout(() => URL.revokeObjectURL(url), 100);
+    toast.success("File downloaded successfully!");
+  };
 
-      const csvContent = `ID,Nom,Adresse IP,OS,Version,Statut\n${agent.id},${agent.nom},${agent.ip},${agent.os || "N/A"},${agent.version},${agent.status}`;
+  const refreshAgentStatus = async () => {
+    if (!agent) {
+      toast.error("No agent available to refresh!");
+      return;
+    }
 
-      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-      const url = URL.createObjectURL(blob);
+    try {
+      const res = await fetch(`http://localhost:8000/deploy/refresh/${agent.id}`, {
+        method: "POST",
+      });
 
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = "agent.csv";
-      link.click();
-
-      setTimeout(() => URL.revokeObjectURL(url), 100);
-
-      toast.success("Fichier téléchargé avec succès !");
-   };
-
-   const refreshAgentStatus = async () => {
-      if (!agent) {
-         toast.error("Aucun agent disponible à rafraîchir !");
-         return;
-      }
-
-      try {
-         const res = await fetch(`http://localhost:8000/deploy/refresh/${agent.id}`, {
-            method: "POST",
-         });
-
-         if (!res.ok) throw new Error("Erreur lors du rafraîchissement");
-         
-         const updatedAgent = await res.json();
-         setAgent(updatedAgent);
-         toast.success("Statut de l'agent mis à jour !");
+      if (!res.ok) throw new Error("Failed to refresh agent");
       
-         window.dispatchEvent(new CustomEvent("agent-refresh", { detail: agent.id }));
-      } catch (err) {
-         toast.error("Impossible de mettre à jour le statut");
-      }
-   };
+      const updatedAgent = await res.json();
+      onAgentChange(updatedAgent);
+      toast.success("Agent status updated!");
+      onRefresh(agent.id);
+    } catch (err) {
+      toast.error("Failed to update agent status");
+    }
+  };
 
-   return (
-      <div className="border border-purple-200 mt-9 mx-6 h-72 rounded-md shadow-sm relative p-4">
-         {/* Action Buttons */}
-         <div className="absolute top-4 right-4 flex space-x-5">
-            {/* Deploy new agent */}
-            <div 
-               className="flex items-center space-x-2 cursor-pointer hover:opacity-80"
-               onClick={() => setIsDeployModal(true)}
-            >
-               <img
-                  src={ICONS.Add}
-                  alt="Déployer un nouvel agent"
-                  className="w-6 h-6"
-               />
-               <h3 className="text-sm font-medium text-purple-700">
-                  Déployer
-               </h3>
-            </div>
+  return (
+    <div className="border border-purple-200 mt-9 mx-6 h-72 rounded-md shadow-sm relative p-4">
+      {/* Action Buttons */}
+      <div className="absolute top-4 right-4 flex space-x-5">
+        {/* Deploy new agent */}
+        <div 
+          className="flex items-center space-x-2 cursor-pointer hover:opacity-80"
+          onClick={() => setIsDeployModal(true)}
+        >
+          <img src={ICONS.Add} alt="Deploy new agent" className="w-6 h-6" />
+          <h3 className="text-sm font-medium text-purple-700">Deploy</h3>
+        </div>
 
-            {/* Refresh */}
-            <div 
-               className="flex items-center space-x-2 cursor-pointer hover:opacity-80"
-               onClick={refreshAgentStatus}
-            >
-               <img
-                  src={ICONS.Refresh}
-                  alt="Rafraîchir les données"
-                  className="w-6 h-6"
-               />
-               <h3 className="text-sm font-medium text-purple-700">
-                  Rafraîchir
-               </h3>
-            </div>
+        {/* Refresh */}
+        <div 
+          className="flex items-center space-x-2 cursor-pointer hover:opacity-80"
+          onClick={refreshAgentStatus}
+        >
+          <img src={ICONS.Refresh} alt="Refresh data" className="w-6 h-6" />
+          <h3 className="text-sm font-medium text-purple-700">Refresh</h3>
+        </div>
 
-            {/* Export */}
-            <div 
-               className="flex items-center space-x-2 cursor-pointer hover:opacity-80"
-               onClick={handleExport}
-            >
-               <img
-                  src={ICONS.Download}
-                  alt="Exporter les données"
-                  className="w-6 h-6"
-               />
-               <h3 className="text-sm font-medium text-purple-700">
-                  Exporter
-               </h3>
-            </div>
-         </div>
-
-         {/* Table */}
-         <AgentTable agent={agent} onDelete={handleDelete} />
-
-         {/* Deploy Modal */}
-         {isDeployModal && (
-            <DeployedAgentModal
-               onClose={() => {
-                  setIsDeployModal(false);
-                  fetchAgent();
-               }}
-            />
-         )}
+        {/* Export */}
+        <div 
+          className="flex items-center space-x-2 cursor-pointer hover:opacity-80"
+          onClick={handleExport}
+        >
+          <img src={ICONS.Download} alt="Export data" className="w-6 h-6" />
+          <h3 className="text-sm font-medium text-purple-700">Export</h3>
+        </div>
       </div>
-   );
+
+      {/* Table */}
+      <AgentTable agent={agent} onDelete={handleDelete} />
+
+      {/* Deploy Modal */}
+      {isDeployModal && (
+        <DeployedAgentModal
+          onClose={() => {
+            setIsDeployModal(false);
+            onRefresh(agent?.id);
+          }}
+          onAgentCreated={(newAgent) => {
+            onAgentChange(newAgent);
+            onRefresh(newAgent.id);
+          }}
+        />
+      )}
+    </div>
+  );
 }
 
 export default AgentUse;
