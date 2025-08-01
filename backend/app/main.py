@@ -2,7 +2,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from .database import Base, engine, SessionLocal
 from fastapi import FastAPI
 from .models import User
-from .routes import auth
+from .routes import auth, deploy
 
 app = FastAPI()
 
@@ -27,3 +27,4 @@ def init_admin():
 init_admin()
 
 app.include_router(auth.router)
+app.include_router(deploy.router)
