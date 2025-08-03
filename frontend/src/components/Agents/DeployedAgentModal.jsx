@@ -2,11 +2,12 @@ import { useState, useEffect } from 'react';
 import { generateDeployScript } from '../../scripts/deployAgentTemplate';
 import toast from 'react-hot-toast';
 import { generateRandomPassword } from '../../utils/generateRandomPassword';
+import { createAgent } from '../../services';
 
 const DeployedAgentModal = ({ onClose, onAgentCreated }) => {
   const [ip, setIp] = useState('');
   const [port, setPort] = useState('22');
-  const [isLoading, setIsLoading] = useState(false);
+  const [_, setIsLoading] = useState(false);
   const [downloadUrl, setDownloadUrl] = useState('');
   const [step, setStep] = useState(1);
 
@@ -61,21 +62,8 @@ const DeployedAgentModal = ({ onClose, onAgentCreated }) => {
     setTimeout(async () => {
       try {
         const generatedPassword = generateRandomPassword(16);
-        const response = await fetch("http://localhost:8000/deploy/", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            ip: ip.trim(),
-            port: parseInt(port),
-            password: generatedPassword
-          }),
-        });
+        const newAgent = await createAgent(ip.trim(), parseInt(port), generatedPassword);
 
-        if (!response.ok) {
-          throw new Error("Échec lors de l'enregistrement dans la base de données");
-        }
-
-        const newAgent = await response.json();
         const scriptContent = generateDeployScript(ip, port, generatedPassword);
         const blob = new Blob([scriptContent], { type: 'text/plain' });
         const url = URL.createObjectURL(blob);
@@ -83,9 +71,7 @@ const DeployedAgentModal = ({ onClose, onAgentCreated }) => {
         setDownloadUrl(url);
         setStep(3);
         
-        if (onAgentCreated) {
-          onAgentCreated(newAgent);
-        }
+        if (onAgentCreated) onAgentCreated(newAgent);
         window.dispatchEvent(new CustomEvent("agent-refresh", { detail: newAgent.id }));
 
       } catch (err) {

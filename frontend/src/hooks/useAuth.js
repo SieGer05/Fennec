@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { login as apiLogin } from "../services/auth";
+import { login as apiLogin } from "../services/authApi";
 
 export function useAuth() {
     const [ isLoggedIn, setIsLoggedIn ] = useState(() => {

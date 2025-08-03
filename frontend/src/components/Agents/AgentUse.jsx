@@ -2,6 +2,7 @@ import { ICONS } from "../../assets";
 import { toast } from "react-hot-toast";
 import AgentTable from "./AgentTable";
 import DeployedAgentModal from "./DeployedAgentModal";
+import { refreshAgent, deleteAgent } from "../../services";
 import { useState } from "react";
 
 function AgentUse({ agent, onAgentChange, onRefresh }) {
@@ -14,17 +15,12 @@ function AgentUse({ agent, onAgentChange, onRefresh }) {
     if (!confirmDelete) return;
 
     try {
-      const res = await fetch(`http://localhost:8000/deploy/${agent.id}`, {
-        method: "DELETE",
-      });
-
-      if (!res.ok) throw new Error("Failed to delete agent");
+      await deleteAgent(agent.id);
 
       onAgentChange(null);
-      toast.success("Agent deleted successfully!");
       onRefresh(null);
     } catch (err) {
-      toast.error("Failed to delete agent");
+      console.err(err);
     }
   };
 
@@ -54,18 +50,11 @@ function AgentUse({ agent, onAgentChange, onRefresh }) {
     }
 
     try {
-      const res = await fetch(`http://localhost:8000/deploy/refresh/${agent.id}`, {
-        method: "POST",
-      });
-
-      if (!res.ok) throw new Error("Failed to refresh agent");
-      
-      const updatedAgent = await res.json();
+      const updatedAgent = await refreshAgent(agent.id);
       onAgentChange(updatedAgent);
-      toast.success("Agent status updated!");
       onRefresh(agent.id);
     } catch (err) {
-      toast.error("Failed to update agent status");
+      console.err(err);
     }
   };
 

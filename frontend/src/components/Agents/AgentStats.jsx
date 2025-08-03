@@ -2,45 +2,44 @@ import { useEffect, useState } from "react";
 import AgentPieChart from "./AgentPieChart";
 import StatCard from "./StatCard";
 import PerformanceList from "./PerformanceList";
-import { toast } from "react-hot-toast";
+import { fetchAgentStatus, fetchAgentMetrics } from "../../services";
+
 
 function AgentStats({ agent }) {
   const [statusData, setStatusData] = useState([]);
   const [performances, setPerformances] = useState([]);
 
-  const fetchStatus = async () => {
+  const loadStatus = async () => {
     try {
-      const res = await fetch("http://localhost:8000/deploy/status");
-      if (!res.ok) throw new Error("Failed to fetch status");
-      setStatusData(await res.json());
+      const data = await fetchAgentStatus();
+      setStatusData(data);
     } catch (err) {
-      toast.error("Failed to load agent status");
+      console.log(err);
     }
   };
 
-  const fetchAgentMetrics = async (agentId) => {
+  const loadAgentMetrics = async (agentId) => {
     if (!agentId) return;
-    
-    try {
-      const res = await fetch(`http://localhost:8000/deploy/metrics/${agentId}`);
-      if (!res.ok) throw new Error("Failed to fetch metrics");
-      const data = await res.json();
 
-      setPerformances([
-        { label: "CPU Usage", value: data.cpu },
-        { label: "Memory Usage", value: data.memory },
-        { label: "Free Disk Space", value: data.disk },
-        { label: "Uptime", value: data.uptime },
-      ]);
+    try {
+      const data = await fetchAgentMetrics(agentId);
+      if (data) {
+        setPerformances([
+          { label: "CPU Usage", value: data.cpu },
+          { label: "Memory Usage", value: data.memory },
+          { label: "Free Disk Space", value: data.disk },
+          { label: "Uptime", value: data.uptime },
+        ]);
+      }
     } catch (err) {
-      toast.error("Failed to load agent metrics");
+      console.log(err);
     }
   };
 
   useEffect(() => {
-    fetchStatus();
+    loadStatus();
     if (agent?.id) {
-      fetchAgentMetrics(agent.id);
+      loadAgentMetrics(agent.id);
     } else {
       setPerformances([]);
     }
