@@ -1,7 +1,14 @@
 import LoginBackground from "../components/Login/LoginBackground";
 import LoginForm from "../components/Login/LoginForm";
+import { Navigate } from "react-router-dom";
 
 function Login() {
+  const isLoggedIn = localStorage.getItem("isLoggedIn");
+
+  if ( isLoggedIn ) {
+    return <Navigate to="/agents" replace />;
+  }
+  
   return (
     <div className="relative min-h-screen w-full">
       <LoginBackground />

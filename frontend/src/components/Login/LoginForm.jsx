@@ -1,11 +1,12 @@
 import { toast } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { use, useState } from "react";
+import { useAuth } from "../../hooks/useAuth";
 
 function LoginForm() {
    const [ username, setUsername ] = useState("");
    const [ password, setPassword ] = useState("");
-   const navigate = useNavigate();
+   const { login } = useAuth();
 
    const handleLogin = async(e) => {
       e.preventDefault();
@@ -16,24 +17,8 @@ function LoginForm() {
       }
 
       try {
-         const response = await fetch("http://127.0.0.1:8000/auth/login", {
-            method: "POST",
-            headers: {
-               "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ username, password }),
-         });
-
-         if (!response.ok) {
-            const err = await response.json();
-            toast.error(err.detail || "Identifiants invalides");
-            return;
-         }
-
+         await login(username, password);
          toast.success("Connexion réussie !");
-         localStorage.setItem("isLoggedIn", "true");
-         navigate("/agents");
-
       } catch (err) {
          console.error(err);
          toast.error("Erreur de connexion");
