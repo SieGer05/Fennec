@@ -1,6 +1,16 @@
 import { IMAGES, ICONS } from "../../assets";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-hot-toast";
 
 function Header() {
+   const navigate = useNavigate();
+
+   const handleLogOut = () => {
+      localStorage.removeItem("isLoggedIn");
+      navigate("/login")
+      toast.success("Déconnexion réussie !");
+   }
+
    return (
       <div className="w-full border-b border-purple-200 h-12 flex items-center px-4 bg-white relative">
          <img
@@ -28,6 +38,7 @@ function Header() {
                src={ICONS.Logout} 
                alt="Logout" 
                className="h-8 w-auto object-contain hover:brightness-80 transition duration-200 cursor-pointer"
+               onClick={handleLogOut}
             />
          </div>
       </div>

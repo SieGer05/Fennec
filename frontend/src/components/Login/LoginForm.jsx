@@ -1,9 +1,11 @@
 import { toast } from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 
 function LoginForm() {
    const [ username, setUsername ] = useState("");
    const [ password, setPassword ] = useState("");
+   const navigate = useNavigate();
 
    const handleLogin = async(e) => {
       e.preventDefault();
@@ -28,13 +30,13 @@ function LoginForm() {
             return;
          }
 
-         const data = await response.json();
-         console.log("Login success: ", data);
          toast.success("Connexion réussie !");
+         localStorage.setItem("isLoggedIn", "true");
+         navigate("/agents");
 
       } catch (err) {
          console.error(err);
-          toast.error("Erreur de connexion");
+         toast.error("Erreur de connexion");
       }
    };
 
