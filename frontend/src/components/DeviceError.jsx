@@ -1,4 +1,14 @@
+import { useAuth } from "../hooks/useAuth";
+import { toast } from "react-hot-toast";
+
 function DeviceError() {
+  const { logout } = useAuth();
+
+  const handleLogout =() => {
+    logout();
+    toast.success("Déconnexion réussie !");
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-white p-4">
       <div className="max-w-md w-full text-center">
@@ -40,6 +50,13 @@ function DeviceError() {
         <p className="text-sm text-gray-500">
           Fennec nécessite un écran plus large pour une expérience optimale.
         </p>
+
+      <button
+        className="mt-8 bg-purple-400 p-2 rounded-xl text-white font-bold
+          cursor-pointer hover:bg-purple-700"
+        onClick={handleLogout}>
+          Déconnexion
+      </button>
       </div>
     </div>
   );

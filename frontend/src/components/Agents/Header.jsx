@@ -1,18 +1,17 @@
 import { IMAGES, ICONS } from "../../assets";
-import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
+import { useAuth } from "../../hooks/useAuth";
 
 function Header() {
-   const navigate = useNavigate();
+   const { logout } = useAuth();
 
    const handleLogOut = () => {
-      localStorage.removeItem("isLoggedIn");
-      navigate("/login")
+      logout();
       toast.success("Déconnexion réussie !");
    }
 
    return (
-      <div className="w-full border-b border-purple-200 h-12 flex items-center px-4 bg-white relative">
+      <div className="w-full border-b bordernp-purple-200 h-12 flex items-center px-4 bg-white relative">
          <img
             src={IMAGES.Logo}
             alt="Logo"

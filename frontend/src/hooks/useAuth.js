@@ -9,15 +9,15 @@ export function useAuth() {
     const navigate = useNavigate();
 
     const login = async (username, password) => {
-            const _ = await apiLogin(username, password);
+        const _ = await apiLogin(username, password);
 
-            localStorage.setItem("isLoggedIn", "true");
-            setIsLoggedIn(true);
+        localStorage.setItem("isLoggedIn", "true");
+        setIsLoggedIn(true);
 
-            navigate("/agents");
-        }
+        navigate("/agents");
+    }
 
-        const logout = () => {
+    const logout = () => {
         localStorage.removeItem("isLoggedIn");
         setIsLoggedIn(false);
         navigate("/login");
