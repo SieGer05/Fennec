@@ -64,7 +64,8 @@ function AgentUse({ agent, onAgentChange, onRefresh }) {
       <div className="absolute top-4 right-4 flex space-x-5">
         {/* Deploy new agent */}
         <div 
-          className="flex items-center space-x-2 cursor-pointer hover:opacity-80"
+          className={`flex items-center space-x-2
+            ${agent ? 'cursor-not-allowed opacity-70' : 'cursor-pointer hover:opacity-80 '}`}
           onClick={() => setIsDeployModal(true)}
         >
           <img src={ICONS.Add} alt="Deploy new agent" className="w-6 h-6" />
