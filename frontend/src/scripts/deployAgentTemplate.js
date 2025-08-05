@@ -108,7 +108,15 @@ sudo -u $TEMP_USER tee "$ANALYSIS_DIR/monitor_metrics.sh" >/dev/null <<'EOF'
 #!/bin/bash
 METRICS_FILE="$HOME/analysis/system_metrics.txt"
 
-CPU_USAGE=$(top -bn1 | grep "Cpu(s)" | sed "s/.*, *\([0-9.]*\)%* id.*/\\1/" | awk '{print 100 - $1}')
+CPU_USAGE=$(top -bn1 | awk -F, '/Cpu\(s\):/ {
+    for(i=1; i<=NF; i++) { 
+        if ($i ~ /id/) { 
+            gsub(/[^0-9.]/, "", $i); 
+            idle = $i; 
+        } 
+    } 
+} 
+END { usage = 100 - idle; printf "%.1f", usage }')
 CPU_USAGE=$(printf "%.1f" "$CPU_USAGE")
 
 MEM_TOTAL=$(free -m | awk '/Mem:/ {print $2}')
