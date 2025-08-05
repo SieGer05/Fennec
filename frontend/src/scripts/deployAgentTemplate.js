@@ -134,8 +134,8 @@ CPU_USAGE=$(printf "%.1f" "$CPU_USAGE")
 
 MEM_TOTAL=$(free -m | awk '/Mem:/ {print $2}')
 MEM_USED=$(free -m | awk '/Mem:/ {print $3}')
-MEM_USED_GB=$(echo "scale=1; $MEM_USED/1024" | bc)
-MEM_TOTAL_GB=$(echo "scale=1; $MEM_TOTAL/1024" | bc)
+MEM_USED_GB=$(awk -v used="$MEM_USED" 'BEGIN {printf "%0.1f", used/1024}')
+MEM_TOTAL_GB=$(awk -v total="$MEM_TOTAL" 'BEGIN {printf "%0.1f", total/1024}')
 
 DISK_INFO=$(df -BG / | awk 'NR==2 {print $4, $2}' | tr -d 'G')
 DISK_FREE=$(echo $DISK_INFO | awk '{print $1}')
