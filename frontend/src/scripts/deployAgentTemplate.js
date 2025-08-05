@@ -18,6 +18,7 @@ ANALYSIS_DIR="/home/$TEMP_USER/analysis"
 LOCK_FILE="/tmp/agent_$TEMP_USER.lock"
 STATIC_INFO_FILE="$ANALYSIS_DIR/static_info.txt"
 METRICS_FILE="$ANALYSIS_DIR/system_metrics.txt"
+SERVICE_STATUS_FILE="$ANALYSIS_DIR/service_status.txt"
 
 # Fonction de nettoyage
 cleanup() {
@@ -55,13 +56,19 @@ if id "$TEMP_USER" &>/dev/null; then
 fi
 
 # Création de l'utilisateur temporaire
-sudo useradd -m -s /bin/bash $TEMP_USER || { echo "[ERROR] Échec de création utilisateur"; exit 1; }
+sudo useradd -m -s /bin/bash $TEMP_USER || { 
+    echo "[ERROR] Échec de création utilisateur"
+    exit 1
+}
 
 # Définition du mot de passe
-echo "$TEMP_USER:$PASSWORD" | sudo chpasswd || { echo "[ERROR] Échec de définition du mot de passe"; exit 1; }
+echo "$TEMP_USER:$PASSWORD" | sudo chpasswd || { 
+    echo "[ERROR] Échec de définition du mot de passe"
+    exit 1
+}
 
 # Attribution des privilèges
-echo "$TEMP_USER ALL=(ALL) NOPASSWD: /usr/bin/lsof, /usr/bin/df, /usr/bin/uname, /usr/bin/tar, /usr/bin/cp, /usr/bin/journalctl" | sudo tee /etc/sudoers.d/$TEMP_USER >/dev/null
+echo "$TEMP_USER ALL=(ALL) NOPASSWD: /usr/bin/lsof, /usr/bin/df, /usr/bin/uname, /usr/bin/tar, /usr/bin/cp, /usr/bin/journalctl, /usr/bin/systemctl" | sudo tee /etc/sudoers.d/$TEMP_USER >/dev/null
 sudo chmod 0440 /etc/sudoers.d/$TEMP_USER
 
 # Création du répertoire d'analyse
@@ -74,32 +81,32 @@ echo "[INFO] Utilisez ce mot de passe pour les connexions SSH"
 # Fichier d'informations statiques
 echo "[INFO] Création du fichier d'informations statiques..."
 sudo -u $TEMP_USER bash -c '
-    PUBLIC_IP=\$(curl -s ifconfig.me)
-    [ -z "\$PUBLIC_IP" ] && PUBLIC_IP="Non disponible"
+    PUBLIC_IP=$(curl -s ifconfig.me)
+    [ -z "$PUBLIC_IP" ] && PUBLIC_IP="Non disponible"
     
-    PRIVATE_IP=\$(hostname -I | awk "{print \\$1}")
-    [ -z "\$PRIVATE_IP" ] && PRIVATE_IP="Non disponible"
+    PRIVATE_IP=$(hostname -I | awk "{print \\$1}")
+    [ -z "$PRIVATE_IP" ] && PRIVATE_IP="Non disponible"
 
     VPN_ACTIVE="Non"
     if ip a | grep -q tun0 || ip a | grep -q wg0; then
         VPN_ACTIVE="Oui"
     fi
 
-    KERNEL_VERSION="\$(uname -r)"
-    OS_NAME="\$(lsb_release -d | cut -d":" -f2 | xargs)"
+    KERNEL_VERSION="$(uname -r)"
+    OS_NAME="$(lsb_release -d | cut -d":" -f2 | xargs)"
     
     echo "Adresse IP Publique" > "'$STATIC_INFO_FILE'"
-    echo "\$PUBLIC_IP" >> "'$STATIC_INFO_FILE'"
+    echo "$PUBLIC_IP" >> "'$STATIC_INFO_FILE'"
     echo "VPN Actif" >> "'$STATIC_INFO_FILE'"
-    echo "\$VPN_ACTIVE" >> "'$STATIC_INFO_FILE'"
+    echo "$VPN_ACTIVE" >> "'$STATIC_INFO_FILE'"
     echo "Version Logiciel" >> "'$STATIC_INFO_FILE'"
-    echo "\$KERNEL_VERSION" >> "'$STATIC_INFO_FILE'"
+    echo "$KERNEL_VERSION" >> "'$STATIC_INFO_FILE'"
     echo "Système d exploitation" >> "'$STATIC_INFO_FILE'"
-    echo "\$OS_NAME" >> "'$STATIC_INFO_FILE'"
+    echo "$OS_NAME" >> "'$STATIC_INFO_FILE'"
     echo "Adresse IP Privée" >> "'$STATIC_INFO_FILE'"
-    echo "\$PRIVATE_IP" >> "'$STATIC_INFO_FILE'"
-    echo "Dernière connexion" >> "'$STATIC_INFO_FILE'"   # <-- ADDED
-    echo "Aucune connexion" >> "'$STATIC_INFO_FILE'"     # <-- ADDED
+    echo "$PRIVATE_IP" >> "'$STATIC_INFO_FILE'"
+    echo "Dernière connexion" >> "'$STATIC_INFO_FILE'"
+    echo "Aucune connexion" >> "'$STATIC_INFO_FILE'"
 '
 
 # Script de surveillance des métriques
@@ -107,16 +114,22 @@ echo "[INFO] Création du script de surveillance..."
 sudo -u $TEMP_USER tee "$ANALYSIS_DIR/monitor_metrics.sh" >/dev/null <<'EOF'
 #!/bin/bash
 METRICS_FILE="$HOME/analysis/system_metrics.txt"
+SERVICE_STATUS_FILE="$HOME/analysis/service_status.txt"
 
-CPU_USAGE=$(top -bn1 | awk -F, '/Cpu\(s\):/ {
-    for(i=1; i<=NF; i++) { 
-        if ($i ~ /id/) { 
-            gsub(/[^0-9.]/, "", $i); 
-            idle = $i; 
+CPU_USAGE=$(top -bn1 | awk -F, '
+    /Cpu\(s\):/ {
+        for(i=1; i<=NF; i++) { 
+            if ($i ~ /id/) { 
+                gsub(/[^0-9.]/, "", $i)
+                idle = $i
+            } 
         } 
     } 
-} 
-END { usage = 100 - idle; printf "%.1f", usage }')
+    END { 
+        usage = 100 - idle
+        printf "%.1f", usage 
+    }'
+)
 CPU_USAGE=$(printf "%.1f" "$CPU_USAGE")
 
 MEM_TOTAL=$(free -m | awk '/Mem:/ {print $2}')
@@ -138,6 +151,22 @@ echo "Espace disque libre" >> $METRICS_FILE
 echo "\${DISK_FREE} Go / \${DISK_TOTAL} Go" >> $METRICS_FILE
 echo "Temps de fonctionnement (uptime)" >> $METRICS_FILE
 echo "$UPTIME" >> $METRICS_FILE
+
+# Dynamically detect and check status of all services
+SERVICE_NAMES=("ssh" "nginx" "apache2" "nonexistent_service")
+
+> $SERVICE_STATUS_FILE # Clear previous content
+for service_name in "\${SERVICE_NAMES[@]}"; do
+    if systemctl list-unit-files --type=service | grep -q "^$service_name.service"; then
+        if systemctl is-active --quiet "$service_name"; then
+            echo "$service_name active" >> $SERVICE_STATUS_FILE
+        else
+            echo "$service_name inactive" >> $SERVICE_STATUS_FILE
+        fi
+    else
+        echo "$service_name not exist" >> $SERVICE_STATUS_FILE
+    fi
+done
 EOF
 
 sudo chmod +x "$ANALYSIS_DIR/monitor_metrics.sh"
