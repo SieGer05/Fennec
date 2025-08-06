@@ -7,9 +7,11 @@ import Refresh from "./icons/refresh.svg"
 import Download from "./icons/download.svg"
 import View from "./icons/view.svg"
 import Delete from "./icons/delete.svg"
+import SadFox from "./images/sad_fox.png"
 
 export const IMAGES = {
    Logo,
+   SadFox,
 };
 
 export const ICONS = {

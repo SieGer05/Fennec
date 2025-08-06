@@ -4,6 +4,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import Login from "./pages/Login";
 import Agents from "./pages/Agents";
 import Audit from "./pages/Audit";
+import NotFound from "./components/NotFound";
 
 function App() {
   return (
@@ -29,6 +30,8 @@ function App() {
             </ProtectedRoute>
           } 
         />
+
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </Router>
   );
