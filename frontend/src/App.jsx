@@ -22,7 +22,7 @@ function App() {
           } 
         />
         <Route 
-          path="/audit" 
+          path="/audit/:agentId" 
           element={
             <ProtectedRoute>
               <Audit />

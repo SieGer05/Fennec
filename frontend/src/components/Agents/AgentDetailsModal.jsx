@@ -1,4 +1,13 @@
+import { useNavigate } from "react-router-dom";
+
 function AgentDetailsModal({ agent, onClose }) {
+   const navigate = useNavigate();
+
+   const handleAuditClick = () => {
+      navigate(`/audit/${agent.id}`);
+      onClose();
+   };
+
    return (
       <div
       className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50"
@@ -35,12 +44,25 @@ function AgentDetailsModal({ agent, onClose }) {
             </p>
          </div>
 
-         <button
-            className="mt-6 px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 transition cursor-pointer"
-            onClick={onClose}
-         >
+         <div className="mt-6 flex flex-col gap-3">
+            <button
+               className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition flex items-center justify-center gap-2 cursor-pointer"
+               onClick={handleAuditClick}
+            >
+               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M12.586 4.586a2 2 0 112.828 2.828l-3 3a2 2 0 01-2.828 0 1 1 0 00-1.414 1.414 4 4 0 005.656 0l3-3a4 4 0 00-5.656-5.656l-1.5 1.5a1 1 0 101.414 1.414l1.5-1.5zm-5 5a2 2 0 012.828 0 1 1 0 101.414-1.414 4 4 0 00-5.656 0l-3 3a4 4 0 105.656 5.656l1.5-1.5a1 1 0 10-1.414-1.414l-1.5 1.5a2 2 0 11-2.828-2.828l3-3z" clipRule="evenodd" />
+               </svg>
+               Voir l'audit des services
+            </button>
+            
+            <button
+               className="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition cursor-pointer"
+               onClick={onClose}
+            >
             Fermer
-         </button>
+            </button>
+        </div>
+
       </div>
       </div>
    );
