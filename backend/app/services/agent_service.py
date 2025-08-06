@@ -184,3 +184,28 @@ class AgentService:
          "disk": output[5] if len(output) > 5 else "N/A",
          "uptime": output[7] if len(output) > 7 else "N/A"
       }
+   
+   def get_service_status(self, agent_id: int) -> List[Dict[str, str]]:
+      agent = self._get_agent_or_404(agent_id)
+      try:
+         with self._ssh_connect(agent) as ssh:
+               _, stdout, _ = ssh.exec_command("cat /home/fennec_user/analysis/service_status.txt")
+               lines = stdout.read().decode().strip().splitlines()
+               
+               seen = set()
+               services = []
+
+               for line in reversed(lines):  
+                  parts = line.split(maxsplit=1)
+                  if len(parts) == 2:
+                     service, status = parts
+                     
+                     if service not in seen:
+                           seen.add(service)
+                           services.append({"service": service, "status": status})
+               
+               services.reverse()
+               return services
+
+      except Exception as e:
+         raise HTTPException(status_code=500, detail=f"Error fetching service status: {e}")
