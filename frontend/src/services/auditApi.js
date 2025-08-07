@@ -16,3 +16,23 @@ export async function fetchAgentServices(agentId) {
         throw error;
     }
 }
+
+export async function fetchSSHConfiguration(agentId) {
+    try {
+        const response = await fetch(
+            `${API_URL}/audit/agents/${agentId}/ssh-configuration`
+        );
+
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => null);
+            const errorMsg = errorData?.detail || response.statusText;
+            throw new Error(`Error ${response.status}: ${errorMsg}`);
+        }
+
+        return await response.json();
+
+    } catch (error) {
+        console.error(`Failed to fetch SSH configuration for agent ${agentId}:`, error);
+        throw error;
+    }
+}
