@@ -4,7 +4,7 @@ from ..models import AgentCredential as AgentCredentialModel
 from ..schemas import AgentCredentialCreate, AgentCredential
 from typing import List, Dict, Any
 from contextlib import contextmanager
-import paramiko
+from .ssh_manager import ssh_cache
 from paramiko.ssh_exception import AuthenticationException, NoValidConnectionsError, SSHException
 
 
@@ -121,22 +121,15 @@ class AgentService:
 
    @contextmanager
    def _ssh_connect(self, agent):
-      """
-      Open SSH connection and ensure proper cleanup.
-      """
-      ssh = paramiko.SSHClient()
-      ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-      ssh.connect(
-         hostname=agent.ip,
-         port=agent.port,
-         username=agent.username,
-         password=agent.password,
-         timeout=5
-      )
+      """Connect using the SSH manager"""
       try:
-         yield ssh
-      finally:
-         ssh.close()
+         with ssh_cache.get_connection(agent) as ssh:
+               yield ssh
+      except Exception as e:
+         raise HTTPException(
+               status_code=500,
+               detail=f"SSH connection failed: {str(e)}"
+         )
 
    def _update_agent_status_via_ssh(self, ssh, agent):
       """
@@ -209,3 +202,8 @@ class AgentService:
 
       except Exception as e:
          raise HTTPException(status_code=500, detail=f"Error fetching service status: {e}")
+      
+   def get_agent_credentials(self, agent_id: int) -> AgentCredentialModel:
+      return self.db.query(AgentCredentialModel).filter(
+         AgentCredentialModel.id == agent_id
+      ).first()

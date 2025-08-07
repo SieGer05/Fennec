@@ -4,6 +4,7 @@ from fastapi import FastAPI
 from .models import User
 from .routes import auth, deploy, audit
 from .config import settings
+from .services.ssh_manager import ssh_cache
 
 app = FastAPI()
 
@@ -30,3 +31,8 @@ init_admin()
 app.include_router(auth.router)
 app.include_router(deploy.router)
 app.include_router(audit.router)
+
+@app.on_event("shutdown")
+async def shutdown_event():
+   """Clean up resources when application shuts down"""
+   ssh_cache.cleanup() 

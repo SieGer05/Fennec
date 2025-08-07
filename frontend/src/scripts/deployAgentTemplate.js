@@ -68,7 +68,10 @@ echo "$TEMP_USER:$PASSWORD" | sudo chpasswd || {
 }
 
 # Attribution des privilèges
-echo "$TEMP_USER ALL=(ALL) NOPASSWD: /usr/bin/lsof, /usr/bin/df, /usr/bin/uname, /usr/bin/tar, /usr/bin/cp, /usr/bin/journalctl, /usr/bin/systemctl" | sudo tee /etc/sudoers.d/$TEMP_USER >/dev/null
+SSHD_PATH=$(command -v sshd)
+SUDO_COMMANDS="/usr/bin/lsof, /usr/bin/df, /usr/bin/uname, /usr/bin/tar, /usr/bin/cp, /usr/bin/journalctl, /usr/bin/systemctl, $SSHD_PATH -T"
+
+echo "$TEMP_USER ALL=(ALL) NOPASSWD: $SUDO_COMMANDS" | sudo tee /etc/sudoers.d/$TEMP_USER >/dev/null
 sudo chmod 0440 /etc/sudoers.d/$TEMP_USER
 
 # Création du répertoire d'analyse
