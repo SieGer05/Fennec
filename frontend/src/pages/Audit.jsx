@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import ServiceStatus from "../components/Audit/ServiceStatus";
 import { fetchAgentServices } from "../services";
+import Header from "../components/Audit/Header";
 
 function Audit() {
   const { agentId } = useParams();
@@ -53,7 +54,7 @@ function Audit() {
             <p>{error}</p>
           </div>
           <button 
-            className="mt-6 bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-lg transition-colors"
+            className="mt-6 bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-lg transition-colors cursor-pointer"
             onClick={() => window.location.reload()}
           >
             Retry Connection
@@ -66,6 +67,7 @@ function Audit() {
   return (
     <div className="bg-purple-100 min-h-screen w-full flex justify-center items-start pt-7 pb-7">
       <div className="bg-white w-[90%] rounded-xl shadow p-6 min-h-[80vh]">
+        <Header />
         <ServiceStatus services={services} />
       </div>
     </div>
