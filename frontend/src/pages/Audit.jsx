@@ -90,7 +90,7 @@ function Audit() {
         <div className="bg-white w-[90%] rounded-xl shadow p-6 min-h-[80vh] flex items-center justify-center">
           <div className="flex flex-col items-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-700 mb-4"></div>
-            <p className="text-purple-800 font-mono">Loading service data from agent...</p>
+            <p className="text-purple-800 font-mono">Chargement des données de service depuis l’agent...</p>
           </div>
         </div>
       </div>
@@ -102,14 +102,14 @@ function Audit() {
       <div className="bg-purple-100 min-h-screen w-full flex justify-center items-start pt-7 pb-7">
         <div className="bg-white w-[90%] rounded-xl shadow p-6 min-h-[80vh] flex flex-col items-center justify-center">
           <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg max-w-md">
-            <h3 className="font-bold text-lg mb-2">Connection Error</h3>
+            <h3 className="font-bold text-lg mb-2">Erreur de connexion</h3>
             <p>{error}</p>
           </div>
           <button 
             className="mt-6 bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-lg transition-colors cursor-pointer"
             onClick={() => window.location.reload()}
           >
-            Retry Connection
+            Réessayer la connexion
           </button>
         </div>
       </div>

@@ -39,7 +39,7 @@ function ServiceStatus({ services, expectedServices, setIsServicesFinished }) {
         <div className="flex flex-col items-center mb-6">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-700 mb-3"></div>
           <p className="text-purple-800 font-opensans pt-4 font-mono text-sm">
-            Analyzing service statuses on remote agent...
+            Analyse des statuts des services sur l’agent distant...
           </p>
         </div>
       )}
@@ -47,7 +47,7 @@ function ServiceStatus({ services, expectedServices, setIsServicesFinished }) {
       {finished && (
         <div className="flex items-center justify-center animate-fade-in">
           <div className="text-center py-3 w-[35%] bg-green-100 rounded-lg mb-6 shadow-sm">
-            <p className="text-green-700 font-semibold">✓ Service audit completed</p>
+            <p className="text-green-700 font-semibold">✓ Audit des services terminé</p>
           </div>
         </div>
       )}
@@ -69,7 +69,7 @@ function ServiceStatus({ services, expectedServices, setIsServicesFinished }) {
                 </h3>
                 {service.status === 'missing' && (
                   <p className="text-sm text-gray-600 mt-1 animate-pulse">
-                    Service not detected on target system
+                    Service non détecté sur le système cible
                   </p>
                 )}
               </div>
