@@ -20,7 +20,7 @@ function Header() {
 
             <div className="w-1/3 text-right">
                 <div className="flex items-center justify-end space-x-4">
-                    <span className="text-2xl font-light text-purple-400">Auditing</span>
+                    <span className="text-xl font-light text-purple-400">Auditing</span>
                     <div className="w-4 h-4 bg-green-500 rounded-full animate-pulse"></div>
                 </div>
             </div>

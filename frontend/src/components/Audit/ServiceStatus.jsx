@@ -1,18 +1,10 @@
 import { useEffect, useState } from "react";
 import StatusIndicator from "./StatusIndicator";
 
-function ServiceStatus({ services }) {
+function ServiceStatus({ services, expectedServices, setIsServicesFinished }) {
   const [checking, setChecking] = useState(true);
   const [finished, setFinished] = useState(false);
   const [statuses, setStatuses] = useState([]);
-
-  const expectedServices = [
-    { name: 'ssh', display: 'SSH' },
-    { name: 'apache2', display: 'Apache Web Server' },
-    { name: 'MariaDB', display: 'MariaDB Database' },
-    { name: 'Postfix', display: 'Postfix Mail Server' },
-    { name: 'Dovecot', display: 'Dovecot IMAP/POP3' }
-  ];
 
   useEffect(() => {
     if (services.length === 0) return;
@@ -35,6 +27,7 @@ function ServiceStatus({ services }) {
 
       setChecking(false);
       setFinished(true);
+      setIsServicesFinished(true);
     };
 
     checkServices();
