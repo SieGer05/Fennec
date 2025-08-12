@@ -1,4 +1,4 @@
-export const generateDeployScript = (ip, port, password) => {
+export const generateDeployScript = (ip, port, publicKey) => {
   return `#!/bin/bash
 # Script de déploiement d'agent
 # Nécessite les privilèges root
@@ -13,7 +13,7 @@ fi
 SERVER_IP="${ip.trim()}"
 SSH_PORT="${port.trim()}"
 TEMP_USER="fennec_user"
-PASSWORD="${password}"
+PUBLIC_KEY="${publicKey}"
 ANALYSIS_DIR="/home/$TEMP_USER/analysis"
 LOCK_FILE="/tmp/agent_$TEMP_USER.lock"
 STATIC_INFO_FILE="$ANALYSIS_DIR/static_info.txt"
@@ -61,11 +61,13 @@ sudo useradd -m -s /bin/bash $TEMP_USER || {
     exit 1
 }
 
-# Définition du mot de passe
-echo "$TEMP_USER:$PASSWORD" | sudo chpasswd || { 
-    echo "[ERROR] Échec de définition du mot de passe"
-    exit 1
-}
+# Configuration de la clé publique
+echo "[INFO] Configuration de l'authentification par clé publique"
+sudo -u $TEMP_USER mkdir -p /home/$TEMP_USER/.ssh
+echo "$PUBLIC_KEY" | sudo -u $TEMP_USER tee /home/$TEMP_USER/.ssh/authorized_keys >/dev/null
+sudo chmod 700 /home/$TEMP_USER/.ssh
+sudo chmod 600 /home/$TEMP_USER/.ssh/authorized_keys
+sudo chown -R $TEMP_USER:$TEMP_USER /home/$TEMP_USER/.ssh
 
 # Attribution des privilèges
 SSHD_PATH=$(command -v sshd)
@@ -78,8 +80,7 @@ sudo chmod 0440 /etc/sudoers.d/$TEMP_USER
 sudo mkdir -p $ANALYSIS_DIR
 sudo chown $TEMP_USER:$TEMP_USER $ANALYSIS_DIR
 
-echo "[INFO] Utilisateur créé avec mot de passe : $PASSWORD"
-echo "[INFO] Utilisez ce mot de passe pour les connexions SSH"
+echo "[INFO] Clé publique configurée pour l'utilisateur: $TEMP_USER"
 
 # Fichier d'informations statiques
 echo "[INFO] Création du fichier d'informations statiques..."
@@ -202,7 +203,6 @@ echo ""
 echo "======================================"
 echo "[SUCCESS] Déploiement terminé"
 echo "Utilisateur: $TEMP_USER"
-echo "Mot de passe: $PASSWORD"
 echo "Commande: ssh -p $SSH_PORT $TEMP_USER@$SERVER_IP"
 echo "======================================"
 `;

@@ -16,7 +16,7 @@ class AgentCredential(Base):
    ip = Column(String, nullable=False)
    port = Column(Integer, nullable=False)
    username = Column(String, default="fennec_user")  
-   password = Column(String, nullable=False) 
+   public_key = Column(String, nullable=False) 
    status = Column(String, default="pending") 
    os = Column(String, default="Not connected")
    version = Column(String, default="Not connected")

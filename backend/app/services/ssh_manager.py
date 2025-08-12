@@ -9,14 +9,14 @@ class SSHCache:
     def __init__(self):
         self._connections: Dict[int, tuple] = {} 
         self._lock = Lock()
-        self.connection_timeout = 300 
+        self.connection_timeout = 300  
 
     @contextmanager
     def get_connection(self, agent: AgentCredentialModel):
-        """Get a cached connection or create new one"""
+        """Get a cached SSH connection or create a new one"""
         with self._lock:
             self._clean_expired_connections()
-            
+
             ssh = None
             if agent.id in self._connections:
                 ssh, _ = self._connections[agent.id]
@@ -27,17 +27,15 @@ class SSHCache:
             if not ssh:
                 ssh = self._create_new_connection(agent)
                 self._connections[agent.id] = (ssh, time.time())
-            
+
             try:
                 yield ssh
                 self._connections[agent.id] = (ssh, time.time())
-
             except Exception:
                 self._close_connection(agent.id)
                 raise
 
     def _clean_expired_connections(self):
-        """Remove connections that haven't been used for timeout period"""
         current_time = time.time()
         expired = [
             agent_id for agent_id, (_, last_used) in self._connections.items()
@@ -47,7 +45,6 @@ class SSHCache:
             self._close_connection(agent_id)
 
     def _is_connection_alive(self, ssh: paramiko.SSHClient) -> bool:
-        """Check if connection is still active"""
         try:
             transport = ssh.get_transport()
             return transport and transport.is_active()
@@ -55,21 +52,20 @@ class SSHCache:
             return False
 
     def _create_new_connection(self, agent: AgentCredentialModel) -> paramiko.SSHClient:
-        """Establish new SSH connection"""
+        """Create new SSH connection using key authentication from default locations or agent"""
         ssh = paramiko.SSHClient()
         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         ssh.connect(
             hostname=agent.ip,
             port=agent.port,
             username=agent.username,
-            password=agent.password,
-            timeout=10,
-            banner_timeout=20
+            look_for_keys=True,   
+            allow_agent=True,     
+            timeout=10
         )
         return ssh
 
     def _close_connection(self, agent_id: int):
-        """Safely close and remove connection"""
         if agent_id in self._connections:
             ssh, _ = self._connections.pop(agent_id)
             try:
@@ -78,7 +74,6 @@ class SSHCache:
                 pass
 
     def cleanup(self):
-        """Clean all connections (call during shutdown)"""
         with self._lock:
             for agent_id in list(self._connections.keys()):
                 self._close_connection(agent_id)

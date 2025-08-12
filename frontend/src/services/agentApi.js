@@ -1,4 +1,3 @@
-// src/api/agentApi.js
 import api from './api';
 import { toast } from 'react-hot-toast';
 
@@ -29,12 +28,20 @@ export const refreshAgent = async (agentId) => {
     return data;
 };
 
-export const createAgent = async (ip, port, password) => {
+export const createAgent = async (ip, port, publicKey) => {
     try {
-        const { data } = await api.post(`${DEPLOY_BASE}/`, { ip, port, password });
+        const { data } = await api.post(`${DEPLOY_BASE}/`, { 
+            ip, 
+            port,
+            public_key: publicKey, 
+            username: 'fennec_user',
+            status: 'pending',      
+            os: 'Not connected',    
+            version: 'Not connected'
+        });
         return data;
     } catch (err) {
-        const errorMsg = err.message || "Failed to create agent";
+        const errorMsg = err.response?.data?.detail || err.message || "Failed to create agent";
         throw new Error(errorMsg);
     }
 };

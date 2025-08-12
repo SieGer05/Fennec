@@ -1,17 +1,18 @@
 import { useState, useEffect } from 'react';
 import { generateDeployScript } from '../../scripts/deployAgentTemplate';
 import toast from 'react-hot-toast';
-import { generateRandomPassword } from '../../utils/generateRandomPassword';
 import { createAgent } from '../../services';
 
 const DeployedAgentModal = ({ onClose, onAgentCreated }) => {
   const [ip, setIp] = useState('');
   const [port, setPort] = useState('22');
+  const [publicKey, setPublicKey] = useState('');
   const [_, setIsLoading] = useState(false);
   const [downloadUrl, setDownloadUrl] = useState('');
   const [step, setStep] = useState(1);
 
   const IPV4_REGEX = /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
+  const SSH_PUBKEY_REGEX = /^(ssh-rsa|ssh-ed25519|ecdsa-sha2-nistp[0-9]+) AAAA[0-9A-Za-z+\/]+[=]{0,3}( [^@]+@[^@]+)?$/;
 
   useEffect(() => {
     return () => {
@@ -43,6 +44,16 @@ const DeployedAgentModal = ({ onClose, onAgentCreated }) => {
       return false;
     }
     
+    if (!publicKey.trim()) {
+      toast.error("Veuillez saisir votre clé publique SSH");
+      return false;
+    }
+    
+    if (!SSH_PUBKEY_REGEX.test(publicKey.trim())) {
+      toast.error("Format de clé publique SSH invalide");
+      return false;
+    }
+    
     return true;
   };
 
@@ -53,34 +64,36 @@ const DeployedAgentModal = ({ onClose, onAgentCreated }) => {
     }
   };
 
-  const handleGenerate = () => {
+  const handleGenerate = async () => {
     if (!validateInputs()) return;
 
     setStep(2);
     setIsLoading(true);
 
-    setTimeout(async () => {
-      try {
-        const generatedPassword = generateRandomPassword(16);
-        const newAgent = await createAgent(ip.trim(), parseInt(port), generatedPassword);
+    try {
+      const newAgent = await createAgent(
+        ip.trim(), 
+        parseInt(port), 
+        publicKey.trim()
+      );
 
-        const scriptContent = generateDeployScript(ip, port, generatedPassword);
-        const blob = new Blob([scriptContent], { type: 'text/plain' });
-        const url = URL.createObjectURL(blob);
+      const scriptContent = generateDeployScript(ip, port, publicKey.trim());
+      const blob = new Blob([scriptContent], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
 
-        setDownloadUrl(url);
-        setStep(3);
-        
-        if (onAgentCreated) onAgentCreated(newAgent);
-        window.dispatchEvent(new CustomEvent("agent-refresh", { detail: newAgent.id }));
+      setDownloadUrl(url);
+      setStep(3);
+      
+      if (onAgentCreated) onAgentCreated(newAgent);
+      window.dispatchEvent(new CustomEvent("agent-refresh", { detail: newAgent.id }));
 
-      } catch (err) {
-        toast.error('Une erreur est survenue lors de la génération du script.');
-        setStep(1);
-      } finally {
-        setIsLoading(false);
-      }
-    }, 3000);
+    } catch (err) {
+      console.error(err);
+      toast.error('Une erreur est survenue lors de la génération du script.');
+      setStep(1);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -125,7 +138,7 @@ const DeployedAgentModal = ({ onClose, onAgentCreated }) => {
             <div className="space-y-6">
               <div>
                 <h3 className="text-lg font-semibold text-gray-800 mb-3">Configuration du Serveur</h3>
-                <p className="text-gray-600 mb-4">Saisissez les détails de votre serveur pour générer le script de déploiement.</p>
+                <p className="text-gray-600 mb-4">Saisissez les détails de votre serveur et votre clé publique SSH.</p>
                 
                 <div className="space-y-4">
                   <div>
@@ -152,14 +165,34 @@ const DeployedAgentModal = ({ onClose, onAgentCreated }) => {
                       className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                     />
                   </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Clé Publique SSH
+                      <span className="text-xs text-gray-500 ml-2">
+                        (ssh-rsa AAA... ou ssh-ed25519 AAA...)
+                      </span>
+                    </label>
+                    <textarea
+                      value={publicKey}
+                      onChange={(e) => setPublicKey(e.target.value)}
+                      placeholder="ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC..."
+                      rows={4}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent font-mono text-sm"
+                    />
+                    <div className="mt-1 text-xs text-gray-500">
+                      <p>Générez votre clé SSH avec: <code className="bg-gray-100 px-1 py-0.5 rounded">ssh-keygen -t ed25519</code></p>
+                      <p>Votre clé publique se trouve dans: <code className="bg-gray-100 px-1 py-0.5 rounded">~/.ssh/id_ed25519.pub</code></p>
+                    </div>
+                  </div>
                 </div>
               </div>
               
               <button
                 onClick={handleGenerate}
-                disabled={!ip.trim()}
+                disabled={!ip.trim() || !publicKey.trim()}
                 className={`w-full py-3.5 px-4 rounded-xl font-medium text-white transition-all ${
-                  !ip.trim()
+                  (!ip.trim() || !publicKey.trim())
                   ? 'bg-gray-300 cursor-not-allowed'
                   : 'bg-gradient-to-r from-purple-600 to-indigo-700 hover:opacity-90 cursor-pointer'
                 }`}
@@ -227,6 +260,7 @@ const DeployedAgentModal = ({ onClose, onAgentCreated }) => {
                   <li>Rendez-le exécutable : <code className="bg-purple-100 px-1.5 py-0.5 rounded">chmod +x deploy_agent.sh</code></li>
                   <li>Exécutez avec : <code className="bg-purple-100 px-1.5 py-0.5 rounded">sudo ./deploy_agent.sh</code></li>
                   <li>Le script se nettoiera automatiquement après exécution</li>
+                  <li>Connectez-vous ensuite avec : <code className="bg-purple-100 px-1.5 py-0.5 rounded">ssh -i ~/.ssh/ma_cle_privee -p {port} fennec_user@{ip}</code></li>
                 </ul>
               </div>
             </div>
@@ -239,7 +273,9 @@ const DeployedAgentModal = ({ onClose, onAgentCreated }) => {
               <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
             </svg>
             <p className="text-sm text-gray-600">
-              Ce script crée un utilisateur temporaire pour collecter les données de configuration système. Il effectue des opérations en lecture seule et nettoie toutes les ressources après exécution. Aucune modification permanente n'est apportée à votre système.
+              Ce script crée un utilisateur temporaire pour collecter les données de configuration système. 
+              Il effectue des opérations en lecture seule et nettoie toutes les ressources après exécution. 
+              Aucune modification permanente n'est apportée à votre système.
             </p>
           </div>
         </div>

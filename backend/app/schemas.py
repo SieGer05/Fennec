@@ -9,11 +9,11 @@ class AgentCredentialBase(BaseModel):
    ip: str
    port: int
    username: str = "fennec_user"
-   password: str
+   public_key: str  
    status: str = "pending"
    os: str = "Not connected"
    version: str = "not connected"
-   vpn_actif: str = "non"           # "oui" or "non"
+   vpn_actif: str = "non"
    last_connection: str = "N/A"
 
 class AgentCredentialCreate(AgentCredentialBase):

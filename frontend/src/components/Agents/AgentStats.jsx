@@ -4,7 +4,6 @@ import StatCard from "./StatCard";
 import PerformanceList from "./PerformanceList";
 import { fetchAgentStatus, fetchAgentMetrics } from "../../services";
 
-
 function AgentStats({ agent }) {
   const [statusData, setStatusData] = useState([]);
   const [performances, setPerformances] = useState([]);
