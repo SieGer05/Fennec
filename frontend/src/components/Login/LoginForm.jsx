@@ -20,7 +20,6 @@ function LoginForm() {
          toast.success("Connexion réussie !");
       } catch (err) {
          console.error(err);
-         toast.error("Erreur de connexion");
       }
    };
 

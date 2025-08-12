@@ -1,38 +1,17 @@
-const API_URL = "http://localhost:8000";
+import api from './api';
 
-export async function fetchAgentServices(agentId) {
-    try {
-        const response = await fetch(`${API_URL}/audit/agents/${agentId}/services`);
+const AUDIT_BASE = '/audit';
 
-        if (!response.ok) {
-            throw new Error(`Error ${response.status}: ${response.statusText}`);
-        }
+export const fetchAgentServices = async (agentId) => {
+    const { data } = await api.get(`${AUDIT_BASE}/agents/${agentId}/services`, {
+        showToast: false 
+    });
+    return data;
+};
 
-        const data = await response.json();
-        return data; 
-
-    } catch (error) {
-        console.error("Failed to fetch agent services:", error);
-        throw error;
-    }
-}
-
-export async function fetchSSHConfiguration(agentId) {
-    try {
-        const response = await fetch(
-            `${API_URL}/audit/agents/${agentId}/ssh-configuration`
-        );
-
-        if (!response.ok) {
-            const errorData = await response.json().catch(() => null);
-            const errorMsg = errorData?.detail || response.statusText;
-            throw new Error(`Error ${response.status}: ${errorMsg}`);
-        }
-
-        return await response.json();
-
-    } catch (error) {
-        console.error(`Failed to fetch SSH configuration for agent ${agentId}:`, error);
-        throw error;
-    }
-}
+export const fetchSSHConfiguration = async (agentId) => {
+    const { data } = await api.get(
+        `${AUDIT_BASE}/agents/${agentId}/ssh-configuration`
+    );
+    return data;
+};

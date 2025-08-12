@@ -1,14 +1,11 @@
-export async function login(username, password) {
-    const response = await fetch("http://127.0.0.1:8000/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password }),
-    });
+import api from './api';
 
-    if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.detail || "Invalid credentials");
+export const login = async (username, password) => {
+    try {
+        const { data } = await api.post('/auth/login', { username, password });
+        return data;
+    } catch (err) {
+        const errorMsg = err.message || "Identifiants invalides";
+        throw new Error(errorMsg);
     }
-
-    return response.json();
-}
+};

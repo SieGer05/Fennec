@@ -1,66 +1,40 @@
-import { toast } from "react-hot-toast";
+// src/api/agentApi.js
+import api from './api';
+import { toast } from 'react-hot-toast';
 
-const API_BASE_URL = "http://localhost:8000/deploy";
+const DEPLOY_BASE = '/deploy';
 
 export const fetchAgentStatus = async () => {
-    try {
-        const res = await fetch(`${API_BASE_URL}/status`);
-        if (!res.ok) throw new Error("Failed to fetch agent status");
-        return await res.json();
-    } catch (err) {
-        toast.error("Failed to load agent status");
-        throw err;
-    }
+    const { data } = await api.get(`${DEPLOY_BASE}/status`);
+    return data;
 };
 
 export const fetchAgentMetrics = async (agentId) => {
     if (!agentId) return;
-    try {
-        const res = await fetch(`${API_BASE_URL}/metrics/${agentId}`);
-        if (!res.ok) throw new Error("Failed to fetch agent metrics");
-        return await res.json();
-    } catch (err) {
-        console.log("Failed to load agent metrics");
-        throw err;
-    }
+    const { data } = await api.get(`${DEPLOY_BASE}/metrics/${agentId}`, {
+        showToast: false
+    });
+    return data;
 };
 
 export const deleteAgent = async (agentId) => {
-    try {
-        const res = await fetch(`${API_BASE_URL}/${agentId}`, { method: "DELETE" });
-        if (!res.ok) throw new Error("Failed to delete agent");
-        toast.success("Agent deleted successfully!");
-        return true;
-    } catch (err) {
-        toast.error("Failed to delete agent");
-        throw err;
-    }
+    await api.delete(`${DEPLOY_BASE}/${agentId}`);
+    toast.success("Agent deleted successfully!");
+    return true;
 };
 
 export const refreshAgent = async (agentId) => {
-    try {
-        const res = await fetch(`${API_BASE_URL}/refresh/${agentId}`, { method: "POST" });
-        if (!res.ok) throw new Error("Failed to refresh agent");
-        const updatedAgent = await res.json();
-        toast.success("Agent status updated!");
-        return updatedAgent;
-    } catch (err) {
-        toast.error("Failed to update agent status");
-        throw err;
-    }
+    const { data } = await api.post(`${DEPLOY_BASE}/refresh/${agentId}`);
+    toast.success("Statut de l'agent mis à jour !");
+    return data;
 };
 
-export async function createAgent(ip, port, password) {
-    const response = await fetch(`${API_BASE_URL}/`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ip, port, password }),
-    });
-
-    if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.detail || "Failed to create agent");
+export const createAgent = async (ip, port, password) => {
+    try {
+        const { data } = await api.post(`${DEPLOY_BASE}/`, { ip, port, password });
+        return data;
+    } catch (err) {
+        const errorMsg = err.message || "Failed to create agent";
+        throw new Error(errorMsg);
     }
-
-    return response.json();
-}
+};
