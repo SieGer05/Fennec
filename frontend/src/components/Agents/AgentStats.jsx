@@ -9,17 +9,18 @@ function AgentStats({ agent }) {
   const [performances, setPerformances] = useState([]);
   const [loadingMetrics, setLoadingMetrics] = useState(false);
   const [loadingStatus, setLoadingStatus] = useState(false);
-  const [error, setError] = useState(null);
+  const [statusError, setStatusError] = useState(null);
+  const [metricsError, setMetricsError] = useState(null); 
 
   const loadStatus = async () => {
     try {
       setLoadingStatus(true);
-      setError(null);
+      setStatusError(null);
       const data = await fetchAgentStatus();
       setStatusData(data);
     } catch (err) {
       console.error("Error loading status:", err);
-      setError(err.message);
+      setStatusError(err.message);
     } finally {
       setLoadingStatus(false);
     }
@@ -33,7 +34,7 @@ function AgentStats({ agent }) {
 
     try {
       setLoadingMetrics(true);
-      setError(null);
+      setMetricsError(null);
       const data = await fetchAgentMetrics(agentId);
       
       if (data) {
@@ -46,7 +47,7 @@ function AgentStats({ agent }) {
       }
     } catch (err) {
       console.error("Error loading metrics:", err);
-      setError(err.message);
+      setMetricsError(err.message);
       setPerformances([]);
     } finally {
       setLoadingMetrics(false);
@@ -55,7 +56,9 @@ function AgentStats({ agent }) {
 
   useEffect(() => {
     loadStatus();
-    loadAgentMetrics(agent?.id);
+    if (agent?.id) {
+      loadAgentMetrics(agent.id);
+    }
   }, [agent]);
 
   return (
@@ -69,8 +72,10 @@ function AgentStats({ agent }) {
           <div className="flex justify-center items-center h-full">
             <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-purple-500"></div>
           </div>
-        ) : error ? (
-          <div className="text-center text-red-500 p-4">{error}</div>
+        ) : statusError ? (
+          <div className="mt-23 italic text-center text-red-500 p-4">
+            Échec du chargement du statut
+          </div>
         ) : (
           <AgentPieChart data={statusData} />
         )}
@@ -110,8 +115,10 @@ function AgentStats({ agent }) {
           <div className="flex justify-center items-center h-full">
             <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-purple-500"></div>
           </div>
-        ) : error ? (
-          <div className="text-center text-red-500 p-4">{error}</div>
+        ) : metricsError ? (
+          <div className="mt-23 italic text-center text-red-500 p-4">
+            Échec du chargement des métriques
+          </div>
         ) : (
           <PerformanceList performances={performances} />
         )}

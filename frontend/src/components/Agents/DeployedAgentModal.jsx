@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { generateDeployScript } from '../../scripts/deployAgentTemplate';
+import { getHashInfoText } from '../../scripts/hashInfoTemplate';
 import toast from 'react-hot-toast';
 import { createAgent } from '../../services';
 
@@ -9,20 +10,29 @@ const DeployedAgentModal = ({ onClose, onAgentCreated }) => {
     port: '22',
     publicKey: ''
   });
-  const [isLoading, setIsLoading] = useState(false);
+  const [_, setIsLoading] = useState(false);
   const [downloadUrl, setDownloadUrl] = useState('');
+  const [downloadHashUrl, setDownloadHashUrl] = useState(''); 
   const [step, setStep] = useState(1);
   const [progress, setProgress] = useState(0);
 
   const IPV4_REGEX = /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
   const SSH_PUBKEY_REGEX = /^(ssh-rsa|ssh-ed25519|ecdsa-sha2-nistp[0-9]+) AAAA[0-9A-Za-z+\/]+[=]{0,3}( [^@]+@[^@]+)?$/;
 
-  // Clean up object URLs
   useEffect(() => {
     return () => {
       if (downloadUrl) URL.revokeObjectURL(downloadUrl);
+      if (downloadHashUrl) URL.revokeObjectURL(downloadHashUrl);
     };
-  }, [downloadUrl]);
+  }, [downloadUrl, downloadHashUrl]);
+
+  const computeSHA256 = async (content) => {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(content);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -95,7 +105,6 @@ const DeployedAgentModal = ({ onClose, onAgentCreated }) => {
     setProgress(0);
 
     try {
-      // Run both the actual generation and progress simulation
       const [newAgent] = await Promise.all([
         createAgent(
           formData.ip.trim(), 
@@ -111,10 +120,20 @@ const DeployedAgentModal = ({ onClose, onAgentCreated }) => {
         formData.publicKey.trim()
       );
       
-      const blob = new Blob([scriptContent], { type: 'text/plain' });
-      const url = URL.createObjectURL(blob);
+      // Compute hash and generate files
+      const computedHash = await computeSHA256(scriptContent);
+      
+      // Create script file
+      const scriptBlob = new Blob([scriptContent], { type: 'text/plain' });
+      const scriptUrl = URL.createObjectURL(scriptBlob);
+      
+      // Create hash info file
+      const hashInfoContent = getHashInfoText(computedHash);
+      const hashInfoBlob = new Blob([hashInfoContent], { type: 'text/plain' });
+      const hashInfoUrl = URL.createObjectURL(hashInfoBlob);
 
-      setDownloadUrl(url);
+      setDownloadUrl(scriptUrl);
+      setDownloadHashUrl(hashInfoUrl);
       setStep(3);
       
       if (onAgentCreated) onAgentCreated(newAgent);
@@ -294,16 +313,29 @@ const DeployedAgentModal = ({ onClose, onAgentCreated }) => {
                 Votre script de déploiement est prêt. Téléchargez-le et exécutez-le sur votre serveur pour déployer l'agent.
               </p>
               
-              <a
-                href={downloadUrl}
-                download="deploy_agent.sh"
-                className="inline-flex items-center justify-center px-6 py-3.5 bg-gradient-to-r from-purple-600 to-indigo-700 text-white font-medium rounded-xl hover:opacity-90 transition-opacity w-full mb-4"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
-                </svg>
-                Télécharger le Script (deploy_agent.sh)
-              </a>
+              <div className="flex flex-col gap-3 mb-6">
+                <a
+                  href={downloadUrl}
+                  download="deploy_agent.sh"
+                  className="inline-flex items-center justify-center px-6 py-3.5 bg-gradient-to-r from-purple-600 to-indigo-700 text-white font-medium rounded-xl hover:opacity-90 transition-opacity"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
+                  </svg>
+                  Télécharger le Script (deploy_agent.sh)
+                </a>
+                
+                <a
+                  href={downloadHashUrl}
+                  download="hash_info.txt"
+                  className="inline-flex items-center justify-center px-6 py-3.5 bg-gray-800 text-white font-medium rounded-xl hover:bg-gray-700 transition-colors"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                  Télécharger les Infos de Hash (hash_info.txt)
+                </a>
+              </div>
               
               <div className="bg-purple-50 rounded-xl p-4 text-left">
                 <h4 className="font-medium text-purple-800 mb-2 flex items-center">
@@ -317,7 +349,7 @@ const DeployedAgentModal = ({ onClose, onAgentCreated }) => {
                   <li>Rendez-le exécutable : <code className="bg-purple-100 px-1.5 py-0.5 rounded">chmod +x deploy_agent.sh</code></li>
                   <li>Exécutez avec : <code className="bg-purple-100 px-1.5 py-0.5 rounded">sudo ./deploy_agent.sh</code></li>
                   <li>Le script se nettoiera automatiquement après exécution</li>
-                  <li>Connectez-vous ensuite avec : <code className="bg-purple-100 px-1.5 py-0.5 rounded">ssh -i ~/.ssh/ma_cle_privee -p {formData.port} fennec_user@{formData.ip}</code></li>
+                  <li>Utilisez <code>hash_info.txt</code> pour vérifier l'intégrité du fichier</li>
                 </ul>
               </div>
             </div>
