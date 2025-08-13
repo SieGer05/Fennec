@@ -3,6 +3,7 @@ import Header from "../components/Agents/Header";
 import AgentStats from "../components/Agents/AgentStats";
 import AgentUse from "../components/Agents/AgentUse";
 import { toast } from "react-hot-toast";
+import { fetchAgents, fetchAgentById } from "../services";
 
 function Agents() {
   const [agent, setAgent] = useState(null);
@@ -11,9 +12,7 @@ function Agents() {
   const fetchAgent = async () => {
     try {
       setLoading(true);
-      const res = await fetch("http://localhost:8000/deploy/");
-      if (!res.ok) throw new Error("Failed to fetch agent");
-      const data = await res.json();
+      const data = await fetchAgents(); 
       setAgent(data.length > 0 ? data[0] : null);
     } catch (err) {
       toast.error("Failed to load agent data");
@@ -27,15 +26,19 @@ function Agents() {
     fetchAgent();
   }, []);
 
-  const handleAgentRefresh = (agentId) => {
+  const handleAgentRefresh = async (agentId) => {
     if (!agentId) {
       setAgent(null);
       return;
     }
-    fetch(`http://localhost:8000/deploy/${agentId}`)
-      .then(res => res.json())
-      .then(data => setAgent(data))
-      .catch(console.error);
+    
+    try {
+      const data = await fetchAgentById(agentId); 
+      setAgent(data);
+    } catch (err) {
+      toast.error("Failed to refresh agent");
+      console.error(err);
+    }
   };
 
   return (
@@ -49,9 +52,9 @@ function Agents() {
         ) : (
           <>
             <AgentStats agent={agent} />
-            <AgentUse 
-              agent={agent} 
-              onAgentChange={setAgent} 
+            <AgentUse
+              agent={agent}
+              onAgentChange={setAgent}
               onRefresh={handleAgentRefresh}
             />
           </>

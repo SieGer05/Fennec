@@ -4,24 +4,42 @@ import toast from 'react-hot-toast';
 import { createAgent } from '../../services';
 
 const DeployedAgentModal = ({ onClose, onAgentCreated }) => {
-  const [ip, setIp] = useState('');
-  const [port, setPort] = useState('22');
-  const [publicKey, setPublicKey] = useState('');
-  const [_, setIsLoading] = useState(false);
+  const [formData, setFormData] = useState({
+    ip: '',
+    port: '22',
+    publicKey: ''
+  });
+  const [isLoading, setIsLoading] = useState(false);
   const [downloadUrl, setDownloadUrl] = useState('');
   const [step, setStep] = useState(1);
+  const [progress, setProgress] = useState(0);
 
   const IPV4_REGEX = /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
   const SSH_PUBKEY_REGEX = /^(ssh-rsa|ssh-ed25519|ecdsa-sha2-nistp[0-9]+) AAAA[0-9A-Za-z+\/]+[=]{0,3}( [^@]+@[^@]+)?$/;
 
+  // Clean up object URLs
   useEffect(() => {
     return () => {
       if (downloadUrl) URL.revokeObjectURL(downloadUrl);
     };
   }, [downloadUrl]);
 
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handlePortChange = (e) => {
+    const value = e.target.value;
+    if (value === '' || /^\d+$/.test(value)) {
+      setFormData(prev => ({ ...prev, port: value }));
+    }
+  };
+
   const validateInputs = () => {
+    const { ip, port, publicKey } = formData;
     const trimmedIp = ip.trim();
+    const trimmedKey = publicKey.trim();
     
     if (!trimmedIp) {
       toast.error("Veuillez saisir une adresse IP valide");
@@ -34,22 +52,17 @@ const DeployedAgentModal = ({ onClose, onAgentCreated }) => {
     }
     
     const portNum = parseInt(port, 10);
-    if (isNaN(portNum)) {
-      toast.error("Veuillez saisir un numéro de port valide");
-      return false;
-    }
-    
-    if (portNum < 1 || portNum > 65535) {
+    if (isNaN(portNum) || portNum < 1 || portNum > 65535) {
       toast.error("Veuillez saisir un numéro de port valide (1-65535)");
       return false;
     }
     
-    if (!publicKey.trim()) {
+    if (!trimmedKey) {
       toast.error("Veuillez saisir votre clé publique SSH");
       return false;
     }
     
-    if (!SSH_PUBKEY_REGEX.test(publicKey.trim())) {
+    if (!SSH_PUBKEY_REGEX.test(trimmedKey)) {
       toast.error("Format de clé publique SSH invalide");
       return false;
     }
@@ -57,11 +70,21 @@ const DeployedAgentModal = ({ onClose, onAgentCreated }) => {
     return true;
   };
 
-  const handlePortChange = (e) => {
-    const value = e.target.value;
-    if (value === '' || /^\d+$/.test(value)) {
-      setPort(value);
-    }
+  const simulateProgress = async () => {
+    return new Promise((resolve) => {
+      const interval = setInterval(() => {
+        setProgress(prev => {
+          const increment = Math.min(10, 100 - prev);
+          const newProgress = prev + increment;
+          if (newProgress >= 100) {
+            clearInterval(interval);
+            resolve();
+            return 100;
+          }
+          return newProgress;
+        });
+      }, 300);
+    });
   };
 
   const handleGenerate = async () => {
@@ -69,15 +92,25 @@ const DeployedAgentModal = ({ onClose, onAgentCreated }) => {
 
     setStep(2);
     setIsLoading(true);
+    setProgress(0);
 
     try {
-      const newAgent = await createAgent(
-        ip.trim(), 
-        parseInt(port), 
-        publicKey.trim()
-      );
+      // Run both the actual generation and progress simulation
+      const [newAgent] = await Promise.all([
+        createAgent(
+          formData.ip.trim(), 
+          parseInt(formData.port), 
+          formData.publicKey.trim()
+        ),
+        simulateProgress()
+      ]);
 
-      const scriptContent = generateDeployScript(ip, port, publicKey.trim());
+      const scriptContent = generateDeployScript(
+        formData.ip, 
+        formData.port, 
+        formData.publicKey.trim()
+      );
+      
       const blob = new Blob([scriptContent], { type: 'text/plain' });
       const url = URL.createObjectURL(blob);
 
@@ -88,13 +121,15 @@ const DeployedAgentModal = ({ onClose, onAgentCreated }) => {
       window.dispatchEvent(new CustomEvent("agent-refresh", { detail: newAgent.id }));
 
     } catch (err) {
-      console.error(err);
-      toast.error('Une erreur est survenue lors de la génération du script.');
+      console.error('Generation error:', err);
+      toast.error(err.message || 'Une erreur est survenue lors de la génération du script.');
       setStep(1);
     } finally {
       setIsLoading(false);
     }
   };
+
+  const isFormValid = formData.ip.trim() && formData.publicKey.trim();
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
@@ -107,7 +142,8 @@ const DeployedAgentModal = ({ onClose, onAgentCreated }) => {
             <h2 className="text-2xl font-bold text-gray-800">Déploiement d'Agent</h2>
             <button 
               onClick={onClose}
-              className="text-gray-500 hover:text-gray-700 text-2xl transition-colors cursor-pointer"
+              className="text-gray-500 hover:text-gray-700 text-2xl transition-colors"
+              aria-label="Fermer la modal"
             >
               &times;
             </button>
@@ -124,7 +160,7 @@ const DeployedAgentModal = ({ onClose, onAgentCreated }) => {
             {[1, 2, 3].map((num) => (
               <div 
                 key={num} 
-                className={`w-8 h-8 rounded-full flex items-center justify-center relative z-20 ${
+                className={`w-8 h-8 rounded-full flex items-center justify-center relative z-20 transition-colors ${
                   step >= num ? 'bg-purple-600 text-white' : 'bg-gray-200 text-gray-500'
                 }`}
               >
@@ -142,43 +178,49 @@ const DeployedAgentModal = ({ onClose, onAgentCreated }) => {
                 
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label htmlFor="ip" className="block text-sm font-medium text-gray-700 mb-1">
                       Adresse IP du Serveur
                     </label>
                     <input
+                      id="ip"
+                      name="ip"
                       type="text"
-                      value={ip}
-                      onChange={(e) => setIp(e.target.value)}
+                      value={formData.ip}
+                      onChange={handleInputChange}
                       placeholder="192.168.1.100"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label htmlFor="port" className="block text-sm font-medium text-gray-700 mb-1">
                       Port SSH
                     </label>
                     <input
+                      id="port"
+                      name="port"
                       type="text"
-                      value={port}
+                      value={formData.port}
                       onChange={handlePortChange}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors"
                     />
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label htmlFor="publicKey" className="block text-sm font-medium text-gray-700 mb-1">
                       Clé Publique SSH
                       <span className="text-xs text-gray-500 ml-2">
                         (ssh-rsa AAA... ou ssh-ed25519 AAA...)
                       </span>
                     </label>
                     <textarea
-                      value={publicKey}
-                      onChange={(e) => setPublicKey(e.target.value)}
+                      id="publicKey"
+                      name="publicKey"
+                      value={formData.publicKey}
+                      onChange={handleInputChange}
                       placeholder="ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC..."
                       rows={4}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent font-mono text-sm"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent font-mono text-sm transition-colors"
                     />
                     <div className="mt-1 text-xs text-gray-500">
                       <p>Générez votre clé SSH avec: <code className="bg-gray-100 px-1 py-0.5 rounded">ssh-keygen -t ed25519</code></p>
@@ -190,9 +232,9 @@ const DeployedAgentModal = ({ onClose, onAgentCreated }) => {
               
               <button
                 onClick={handleGenerate}
-                disabled={!ip.trim() || !publicKey.trim()}
+                disabled={!isFormValid}
                 className={`w-full py-3.5 px-4 rounded-xl font-medium text-white transition-all ${
-                  (!ip.trim() || !publicKey.trim())
+                  !isFormValid
                   ? 'bg-gray-300 cursor-not-allowed'
                   : 'bg-gradient-to-r from-purple-600 to-indigo-700 hover:opacity-90 cursor-pointer'
                 }`}
@@ -205,21 +247,36 @@ const DeployedAgentModal = ({ onClose, onAgentCreated }) => {
           {/* Step 2: Generation */}
           {step === 2 && (
             <div className="flex flex-col items-center justify-center py-8">
-              <div className="relative mb-6">
-                <div className="w-20 h-20 rounded-full bg-purple-100 flex items-center justify-center">
-                  <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-purple-600"></div>
+              <div className="w-full max-w-xs mb-6">
+                <div className="relative h-2 bg-gray-200 rounded-full mb-6">
+                  <div 
+                    className="absolute top-0 left-0 h-full bg-gradient-to-r from-purple-500 to-indigo-600 rounded-full transition-all duration-300"
+                    style={{ width: `${progress}%` }}
+                  ></div>
                 </div>
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-purple-600" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M12.586 4.586a2 2 0 112.828 2.828l-3 3a2 2 0 01-2.828 0 1 1 0 00-1.414 1.414 4 4 0 005.656 0l3-3a4 4 0 00-5.656-5.656l-1.5 1.5a1 1 0 101.414 1.414l1.5-1.5zm-5 5a2 2 0 012.828 0 1 1 0 101.414-1.414 4 4 0 00-5.656 0l-3 3a4 4 0 105.656 5.656l1.5-1.5a1 1 0 10-1.414-1.414l-1.5 1.5a2 2 0 11-2.828-2.828l3-3z" clipRule="evenodd" />
-                  </svg>
+                
+                <div className="text-center">
+                  <div className="w-20 h-20 rounded-full bg-purple-100 flex items-center justify-center mx-auto mb-4">
+                    {progress < 100 ? (
+                      <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-purple-600"></div>
+                    ) : (
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-purple-600" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                    )}
+                  </div>
+                  
+                  <h3 className="text-xl font-semibold text-gray-800 mb-2">
+                    {progress < 30 && "Initialisation..."}
+                    {progress >= 30 && progress < 70 && "Génération en cours..."}
+                    {progress >= 70 && progress < 100 && "Finalisation..."}
+                    {progress === 100 && "Terminé !"}
+                  </h3>
+                  <p className="text-gray-600">
+                    {progress}% complété
+                  </p>
                 </div>
               </div>
-              
-              <h3 className="text-xl font-semibold text-gray-800 mb-2">Génération du Script</h3>
-              <p className="text-gray-600 text-center max-w-xs">
-                Veuillez patienter pendant que nous créons votre script de déploiement personnalisé. Cela prend généralement quelques secondes.
-              </p>
             </div>
           )}
           
@@ -240,7 +297,7 @@ const DeployedAgentModal = ({ onClose, onAgentCreated }) => {
               <a
                 href={downloadUrl}
                 download="deploy_agent.sh"
-                className="inline-flex items-center justify-center px-6 py-3.5 bg-gradient-to-r from-purple-600 to-indigo-700 text-white font-medium rounded-xl hover:opacity-90 transition-opacity w-full mb-4 cursor-pointer"
+                className="inline-flex items-center justify-center px-6 py-3.5 bg-gradient-to-r from-purple-600 to-indigo-700 text-white font-medium rounded-xl hover:opacity-90 transition-opacity w-full mb-4"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
                   <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
@@ -260,7 +317,7 @@ const DeployedAgentModal = ({ onClose, onAgentCreated }) => {
                   <li>Rendez-le exécutable : <code className="bg-purple-100 px-1.5 py-0.5 rounded">chmod +x deploy_agent.sh</code></li>
                   <li>Exécutez avec : <code className="bg-purple-100 px-1.5 py-0.5 rounded">sudo ./deploy_agent.sh</code></li>
                   <li>Le script se nettoiera automatiquement après exécution</li>
-                  <li>Connectez-vous ensuite avec : <code className="bg-purple-100 px-1.5 py-0.5 rounded">ssh -i ~/.ssh/ma_cle_privee -p {port} fennec_user@{ip}</code></li>
+                  <li>Connectez-vous ensuite avec : <code className="bg-purple-100 px-1.5 py-0.5 rounded">ssh -i ~/.ssh/ma_cle_privee -p {formData.port} fennec_user@{formData.ip}</code></li>
                 </ul>
               </div>
             </div>
