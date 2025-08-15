@@ -1,210 +1,210 @@
 [
   {
-    "directive": "Require",
-    "expected": "all denied",
-    "severity": "high",
-    "description": "Refuser l'accès au répertoire racine du système d'exploitation par défaut pour prévenir tout accès non intentionnel. Cette directive constitue une mesure de sécurité fondamentale qui empêche l'exposition accidentelle de fichiers système critiques.",
-    "file": "/etc/apache2/apache2.conf",
-    "source": "4.1 https://www.itsecure.hu/wp-content/uploads/2023/12/DRAFT_CIS_Apache_HTTP_Server_2.4_Benchmark_v2.0.0.pdf"
+  "directive": "Require",
+  "expected": "all denied",
+  "severity": "high",
+  "description": "Refuser l'accès au répertoire racine du système d'exploitation par défaut pour prévenir tout accès non intentionnel. Cette directive constitue une mesure de sécurité fondamentale qui empêche l'exposition accidentelle de fichiers système critiques.",
+  "file": "/etc/apache2/apache2.conf",
+  "source": "AS24-U2-000350 https://public.cyber.mil/stigs/downloads/ (STIG Apache Server 2.4 Unix Site v2r6, 2025)"
   },
   {
-    "directive": "AllowOverride",
-    "expected": "None",
-    "severity": "high",
-    "description": "Désactiver les substitutions pour le répertoire racine du système afin d'empêcher les modifications de configuration non autorisées. Cette configuration empêche l'utilisation de fichiers .htaccess qui pourraient compromettre la sécurité globale du serveur.",
-    "file": "/etc/apache2/apache2.conf",
-    "source": "4.3 https://www.itsecure.hu/wp-content/uploads/2023/12/DRAFT_CIS_Apache_HTTP_Server_2.4_Benchmark_v2.0.0.pdf"
+  "directive": "AllowOverride",
+  "expected": "None",
+  "severity": "high",
+  "description": "Désactiver les substitutions pour le répertoire racine du système afin d'empêcher les modifications de configuration non autorisées. Cette configuration empêche l'utilisation de fichiers .htaccess qui pourraient compromettre la sécurité globale du serveur.",
+  "file": "/etc/apache2/apache2.conf",
+  "source": "AS24-U2-000320 https://public.cyber.mil/stigs/downloads/ (STIG Apache Server 2.4 Unix Site v2r6, 2025)"
   },
   {
-    "directive": "Options",
-    "expected": "None",
-    "severity": "high",
-    "description": "Restreindre les options du répertoire racine du système pour minimiser la surface d'attaque. En désactivant toutes les options, on élimine les fonctionnalités potentiellement dangereuses comme la navigation de répertoire et l'exécution de scripts.",
-    "file": "/etc/apache2/apache2.conf",
-    "source": "5.1 https://www.itsecure.hu/wp-content/uploads/2023/12/DRAFT_CIS_Apache_HTTP_Server_2.4_Benchmark_v2.0.0.pdf"
+  "directive": "Options",
+  "expected": "None",
+  "severity": "high",
+  "description": "Restreindre les options du répertoire racine du système pour minimiser la surface d'attaque. En désactivant toutes les options, on élimine les fonctionnalités potentiellement dangereuses comme la navigation de répertoire et l'exécution de scripts.",
+  "file": "/etc/apache2/apache2.conf",
+  "source": "AS24-U2-000300 https://public.cyber.mil/stigs/downloads/ (STIG Apache Server 2.4 Unix Site v2r6, 2025)"
   },
   {
-    "directive": "Options",
-    "expected": "None",
-    "severity": "high",
-    "description": "Restreindre les options du répertoire racine web au minimum requis. Cette configuration garantit que seules les fonctionnalités strictement nécessaires sont activées pour le serveur web, réduisant ainsi les risques de sécurité.",
-    "file": "/etc/apache2/apache2.conf",
-    "source": "5.2 https://www.itsecure.hu/wp-content/uploads/2023/12/DRAFT_CIS_Apache_HTTP_Server_2.4_Benchmark_v2.0.0.pdf"
+  "directive": "Options",
+  "expected": "None",
+  "severity": "high",
+  "description": "Restreindre les options du répertoire racine web au minimum requis. Cette configuration garantit que seules les fonctionnalités strictement nécessaires sont activées pour le serveur web, réduisant ainsi les risques de sécurité.",
+  "file": "/etc/apache2/apache2.conf",
+  "source": "AS24-U2-000300 https://public.cyber.mil/stigs/downloads/ (STIG Apache Server 2.4 Unix Site v2r6, 2025)"
   },
   {
-    "directive": "LogLevel",
-    "expected": "notice core:info",
-    "severity": "high",
-    "description": "Configurer le niveau de gravité du journal d'erreurs pour une surveillance efficace. Ce paramétrage permet de capturer les événements importants tout en évitant la surcharge d'informations, facilitant ainsi la détection d'incidents de sécurité.",
-    "file": "/etc/apache2/apache2.conf",
-    "source": "6.1 https://www.itsecure.hu/wp-content/uploads/2023/12/DRAFT_CIS_Apache_HTTP_Server_2.4_Benchmark_v2.0.0.pdf"
+  "directive": "LogLevel",
+  "expected": "notice core:info",
+  "severity": "high",
+  "description": "Configurer le niveau de gravité du journal d'erreurs pour une surveillance efficace. Ce paramétrage permet de capturer les événements importants tout en évitant la surcharge d'informations, facilitant ainsi la détection d'incidents de sécurité.",
+  "file": "/etc/apache2/apache2.conf",
+  "source": "AS24-U2-000090 https://public.cyber.mil/stigs/downloads/ (STIG Apache Server 2.4 Unix Site v2r6, 2025)"
   },
   {
-    "directive": "ErrorLog",
-    "expected": "syslog:local1",
-    "severity": "medium",
-    "description": "Configurer la journalisation des erreurs vers une installation syslog pour une surveillance intégrée des journaux. Cette approche centralise la gestion des logs et facilite leur analyse par les outils de surveillance de sécurité.",
-    "file": "/etc/apache2/apache2.conf",
-    "source": "6.2 https://www.itsecure.hu/wp-content/uploads/2023/12/DRAFT_CIS_Apache_HTTP_Server_2.4_Benchmark_v2.0.0.pdf"
+  "directive": "ErrorLog",
+  "expected": "syslog:local1",
+  "severity": "medium",
+  "description": "Configurer la journalisation des erreurs vers une installation syslog pour une surveillance intégrée des journaux. Cette approche centralise la gestion des logs et facilite leur analyse par les outils de surveillance de sécurité.",
+  "file": "/etc/apache2/apache2.conf",
+  "source": "AS24-U2-000090 https://public.cyber.mil/stigs/downloads/ (STIG Apache Server 2.4 Unix Site v2r6, 2025)"
   },
   {
-    "directive": "LogFormat",
-    "expected": "%h %l %u %t \\\"%r\\\" %>s %b \\\"%{Referer}i\\\" \\\"%{User-agent}i\\\" combined",
-    "severity": "high",
-    "description": "Configurer le format de journal pour une journalisation d'accès détaillée. Ce format standard capture les informations essentielles pour l'analyse forensique et la détection d'activités suspectes, incluant l'IP source, l'utilisateur, la requête et l'agent utilisateur.",
-    "file": "/etc/apache2/apache2.conf",
-    "source": "6.3 https://www.itsecure.hu/wp-content/uploads/2023/12/DRAFT_CIS_Apache_HTTP_Server_2.4_Benchmark_v2.0.0.pdf"
+  "directive": "LogFormat",
+  "expected": "%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-agent}i\" combined",
+  "severity": "high",
+  "description": "Configurer le format de journal pour une journalisation d'accès détaillée. Ce format standard capture les informations essentielles pour l'analyse forensique et la détection d'activités suspectes, incluant l'IP source, l'utilisateur, la requête et l'agent utilisateur.",
+  "file": "/etc/apache2/apache2.conf",
+  "source": "AS24-U2-000090 https://public.cyber.mil/stigs/downloads/ (STIG Apache Server 2.4 Unix Site v2r6, 2025)"
   },
   {
-    "directive": "CustomLog",
-    "expected": "logs/access_log combined",
-    "severity": "high",
-    "description": "Configurer le journal d'accès personnalisé avec le format combiné. Cette configuration assure l'enregistrement complet des accès au serveur, élément crucial pour la surveillance de sécurité et la conformité réglementaire.",
-    "file": "/etc/apache2/apache2.conf",
-    "source": "6.3 https://www.itsecure.hu/wp-content/uploads/2023/12/DRAFT_CIS_Apache_HTTP_Server_2.4_Benchmark_v2.0.0.pdf"
+  "directive": "CustomLog",
+  "expected": "logs/access_log combined",
+  "severity": "high",
+  "description": "Configurer le journal d'accès personnalisé avec le format combiné. Cette configuration assure l'enregistrement complet des accès au serveur, élément crucial pour la surveillance de sécurité et la conformité réglementaire.",
+  "file": "/etc/apache2/apache2.conf",
+  "source": "AS24-U2-000090 https://public.cyber.mil/stigs/downloads/ (STIG Apache Server 2.4 Unix Site v2r6, 2025)"
   },
   {
-    "directive": "SSLProtocol",
-    "expected": "all -SSLv2 -SSLv3 -TLSv1 -TLSv1.1",
-    "severity": "high",
-    "description": "Désactiver les protocoles TLS non sécurisés pour améliorer la sécurité. Cette configuration force l'utilisation de TLS 1.2 et versions supérieures, éliminant les vulnérabilités connues des anciennes versions de protocoles de chiffrement.",
-    "file": "/etc/apache2/mods-available/ssl.conf",
-    "source": "7.4 https://www.itsecure.hu/wp-content/uploads/2023/12/DRAFT_CIS_Apache_HTTP_Server_2.4_Benchmark_v2.0.0.pdf"
+  "directive": "SSLProtocol",
+  "expected": "all -SSLv2 -SSLv3 -TLSv1 -TLSv1.1",
+  "severity": "high",
+  "description": "Désactiver les protocoles TLS non sécurisés pour améliorer la sécurité. Cette configuration force l'utilisation de TLS 1.2 et versions supérieures, éliminant les vulnérabilités connues des anciennes versions de protocoles de chiffrement.",
+  "file": "/etc/apache2/mods-available/ssl.conf",
+  "source": "AS24-U2-000030 https://public.cyber.mil/stigs/downloads/ (STIG Apache Server 2.4 Unix Site v2r6, 2025)"
   },
   {
-    "directive": "SSLCipherSuite",
-    "expected": "HIGH:MEDIUM:!aNULL:!MD5:!RC4:!3DES",
-    "severity": "high",
-    "description": "Désactiver les chiffrements SSL/TLS faibles pour garantir un chiffrement fort. Cette configuration exclut les algorithmes de chiffrement vulnérables et privilégie les suites de chiffrement modernes et robustes.",
-    "file": "/etc/apache2/mods-available/ssl.conf",
-    "source": "7.5 https://www.itsecure.hu/wp-content/uploads/2023/12/DRAFT_CIS_Apache_HTTP_Server_2.4_Benchmark_v2.0.0.pdf"
+  "directive": "SSLCipherSuite",
+  "expected": "HIGH:MEDIUM:!aNULL:!MD5:!RC4:!3DES",
+  "severity": "high",
+  "description": "Désactiver les chiffrements SSL/TLS faibles pour garantir un chiffrement fort. Cette configuration exclut les algorithmes de chiffrement vulnérables et privilégie les suites de chiffrement modernes et robustes.",
+  "file": "/etc/apache2/mods-available/ssl.conf",
+  "source": "AS24-U2-000030 https://public.cyber.mil/stigs/downloads/ (STIG Apache Server 2.4 Unix Site v2r6, 2025)"
   },
   {
-    "directive": "SSLInsecureRenegotiation",
-    "expected": "off",
-    "severity": "high",
-    "description": "Désactiver la renégociation SSL non sécurisée pour prévenir les attaques de type homme du milieu. Cette mesure protège contre les vulnérabilités de renégociation TLS qui peuvent exposer les communications à l'interception.",
-    "file": "/etc/apache2/mods-available/ssl.conf",
-    "source": "7.6 https://www.itsecure.hu/wp-content/uploads/2023/12/DRAFT_CIS_Apache_HTTP_Server_2.4_Benchmark_v2.0.0.pdf"
+  "directive": "SSLInsecureRenegotiation",
+  "expected": "off",
+  "severity": "high",
+  "description": "Désactiver la renégociation SSL non sécurisée pour prévenir les attaques de type homme du milieu. Cette mesure protège contre les vulnérabilités de renégociation TLS qui peuvent exposer les communications à l'interception.",
+  "file": "/etc/apache2/mods-available/ssl.conf",
+  "source": "AS24-U2-000030 https://public.cyber.mil/stigs/downloads/ (STIG Apache Server 2.4 Unix Site v2r6, 2025)"
   },
   {
-    "directive": "SSLCompression",
-    "expected": "off",
-    "severity": "high",
-    "description": "Désactiver la compression SSL pour prévenir les attaques CRIME. La compression SSL peut permettre à des attaquants d'extraire des informations sensibles des communications chiffrées, notamment les cookies de session.",
-    "file": "/etc/apache2/mods-available/ssl.conf",
-    "source": "7.7 https://www.itsecure.hu/wp-content/uploads/2023/12/DRAFT_CIS_Apache_HTTP_Server_2.4_Benchmark_v2.0.0.pdf"
+  "directive": "SSLCompression",
+  "expected": "off",
+  "severity": "high",
+  "description": "Désactiver la compression SSL pour prévenir les attaques CRIME. La compression SSL peut permettre à des attaquants d'extraire des informations sensibles des communications chiffrées, notamment les cookies de session.",
+  "file": "/etc/apache2/mods-available/ssl.conf",
+  "source": "AS24-U2-000030 https://public.cyber.mil/stigs/downloads/ (STIG Apache Server 2.4 Unix Site v2r6, 2025)"
   },
   {
-    "directive": "SSLCipherSuite",
-    "expected": "HIGH:!MEDIUM:!aNULL:!MD5:!RC4:!3DES",
-    "severity": "high",
-    "description": "Désactiver les chiffrements SSL/TLS de force moyenne pour une sécurité renforcée. Cette configuration plus stricte n'autorise que les algorithmes de chiffrement de haute sécurité, éliminant même les chiffrements de force moyenne.",
-    "file": "/etc/apache2/mods-available/ssl.conf",
-    "source": "7.8 https://www.itsecure.hu/wp-content/uploads/2023/12/DRAFT_CIS_Apache_HTTP_Server_2.4_Benchmark_v2.0.0.pdf"
+  "directive": "SSLCipherSuite",
+  "expected": "HIGH:!MEDIUM:!aNULL:!MD5:!RC4:!3DES",
+  "severity": "high",
+  "description": "Désactiver les chiffrements SSL/TLS de force moyenne pour une sécurité renforcée. Cette configuration plus stricte n'autorise que les algorithmes de chiffrement de haute sécurité, éliminant même les chiffrements de force moyenne.",
+  "file": "/etc/apache2/mods-available/ssl.conf",
+  "source": "AS24-U2-000030 https://public.cyber.mil/stigs/downloads/ (STIG Apache Server 2.4 Unix Site v2r6, 2025)"
   },
   {
-    "directive": "SSLUseStapling",
-    "expected": "On",
-    "severity": "medium",
-    "description": "Activer l'agrafage OCSP pour une vérification efficace de révocation de certificats. Cette fonctionnalité améliore les performances et la confidentialité en permettant au serveur de fournir directement les réponses de statut des certificats.",
-    "file": "/etc/apache2/mods-available/ssl.conf",
-    "source": "7.10 https://www.itsecure.hu/wp-content/uploads/2023/12/DRAFT_CIS_Apache_HTTP_Server_2.4_Benchmark_v2.0.0.pdf"
+  "directive": "SSLUseStapling",
+  "expected": "On",
+  "severity": "medium",
+  "description": "Activer l'agrafage OCSP pour une vérification efficace de révocation de certificats. Cette fonctionnalité améliore les performances et la confidentialité en permettant au serveur de fournir directement les réponses de statut des certificats.",
+  "file": "/etc/apache2/mods-available/ssl.conf",
+  "source": "AS24-U2-000380 https://public.cyber.mil/stigs/downloads/ (STIG Apache Server 2.4 Unix Site v2r6, 2025)"
   },
   {
-    "directive": "SSLStaplingCache",
-    "expected": "shmcb:logs/ssl_staple_cache(512000)",
-    "severity": "medium",
-    "description": "Configurer le cache d'agrafage pour les réponses OCSP. Cette configuration optimise les performances en mettant en cache les réponses OCSP, réduisant ainsi la latence et la charge sur les serveurs de validation de certificats.",
-    "file": "/etc/apache2/mods-available/ssl.conf",
-    "source": "7.10 https://www.itsecure.hu/wp-content/uploads/2023/12/DRAFT_CIS_Apache_HTTP_Server_2.4_Benchmark_v2.0.0.pdf"
+  "directive": "SSLStaplingCache",
+  "expected": "shmcb:logs/ssl_staple_cache(512000)",
+  "severity": "medium",
+  "description": "Configurer le cache d'agrafage pour les réponses OCSP. Cette configuration optimise les performances en mettant en cache les réponses OCSP, réduisant ainsi la latence et la charge sur les serveurs de validation de certificats.",
+  "file": "/etc/apache2/mods-available/ssl.conf",
+  "source": "AS24-U2-000380 https://public.cyber.mil/stigs/downloads/ (STIG Apache Server 2.4 Unix Site v2r6, 2025)"
   },
   {
-    "directive": "Header",
-    "expected": "always set Strict-Transport-Security \\\"max-age=600; includeSubDomains; preload\\\"",
-    "severity": "medium",
-    "description": "Activer HSTS pour imposer les communications HTTPS. Cette directive force les navigateurs à utiliser exclusivement HTTPS pour accéder au site, incluant tous les sous-domaines, et permet l'inclusion dans les listes de préchargement HSTS.",
-    "file": "/etc/apache2/conf-available/security.conf",
-    "source": "7.11 https://www.itsecure.hu/wp-content/uploads/2023/12/DRAFT_CIS_Apache_HTTP_Server_2.4_Benchmark_v2.0.0.pdf"
+  "directive": "Header",
+  "expected": "always set Strict-Transport-Security \"max-age=600; includeSubDomains; preload\"",
+  "severity": "medium",
+  "description": "Activer HSTS pour imposer les communications HTTPS. Cette directive force les navigateurs à utiliser exclusivement HTTPS pour accéder au site, incluant tous les sous-domaines, et permet l'inclusion dans les listes de préchargement HSTS.",
+  "file": "/etc/apache2/conf-available/security.conf",
+  "source": "AS24-U2-000030 https://public.cyber.mil/stigs/downloads/ (STIG Apache Server 2.4 Unix Site v2r6, 2025)"
   },
   {
-    "directive": "SSLCipherSuite",
-    "expected": "EECDH:EDH:!NULL:!SSLv2:!RC4:!aNULL:!3DES:!IDEA",
-    "severity": "medium",
-    "description": "Activer uniquement les suites de chiffrement qui fournissent la confidentialité persistante (Perfect Forward Secrecy). Cette configuration garantit que même si les clés privées du serveur sont compromises, les communications passées restent protégées.",
-    "file": "/etc/apache2/mods-available/ssl.conf",
-    "source": "7.12 https://www.itsecure.hu/wp-content/uploads/2023/12/DRAFT_CIS_Apache_HTTP_Server_2.4_Benchmark_v2.0.0.pdf"
+  "directive": "SSLCipherSuite",
+  "expected": "EECDH:EDH:!NULL:!SSLv2:!RC4:!aNULL:!3DES:!IDEA",
+  "severity": "medium",
+  "description": "Activer uniquement les suites de chiffrement qui fournissent la confidentialité persistante (Perfect Forward Secrecy). Cette configuration garantit que même si les clés privées du serveur sont compromises, les communications passées restent protégées.",
+  "file": "/etc/apache2/mods-available/ssl.conf",
+  "source": "AS24-U2-000030 https://public.cyber.mil/stigs/downloads/ (STIG Apache Server 2.4 Unix Site v2r6, 2025)"
   },
   {
-    "directive": "ServerTokens",
-    "expected": "Prod",
-    "severity": "high",
-    "description": "Minimiser les informations du serveur dans les en-têtes de réponse HTTP. Cette configuration masque la version détaillée d'Apache et des modules installés, réduisant ainsi les informations disponibles pour les attaquants lors de la reconnaissance.",
-    "file": "/etc/apache2/conf-available/security.conf",
-    "source": "8.1 https://www.itsecure.hu/wp-content/uploads/2023/12/DRAFT_CIS_Apache_HTTP_Server_2.4_Benchmark_v2.0.0.pdf"
+  "directive": "ServerTokens",
+  "expected": "Prod",
+  "severity": "high",
+  "description": "Minimiser les informations du serveur dans les en-têtes de réponse HTTP. Cette configuration masque la version détaillée d'Apache et des modules installés, réduisant ainsi les informations disponibles pour les attaquants lors de la reconnaissance.",
+  "file": "/etc/apache2/conf-available/security.conf",
+  "source": "AS24-U2-000470 https://public.cyber.mil/stigs/downloads/ (STIG Apache Server 2.4 Unix Site v2r6, 2025)"
   },
   {
-    "directive": "ServerSignature",
-    "expected": "Off",
-    "severity": "high",
-    "description": "Supprimer les lignes de signature des documents générés par le serveur. Cette mesure élimine l'affichage d'informations sur le serveur dans les pages d'erreur et les listings de répertoires, réduisant l'exposition d'informations sensibles.",
-    "file": "/etc/apache2/conf-available/security.conf",
-    "source": "8.2 https://www.itsecure.hu/wp-content/uploads/2023/12/DRAFT_CIS_Apache_HTTP_Server_2.4_Benchmark_v2.0.0.pdf"
+  "directive": "ServerSignature",
+  "expected": "Off",
+  "severity": "high",
+  "description": "Supprimer les lignes de signature des documents générés par le serveur. Cette mesure élimine l'affichage d'informations sur le serveur dans les pages d'erreur et les listings de répertoires, réduisant l'exposition d'informations sensibles.",
+  "file": "/etc/apache2/conf-available/security.conf",
+  "source": "AS24-U2-000470 https://public.cyber.mil/stigs/downloads/ (STIG Apache Server 2.4 Unix Site v2r6, 2025)"
   },
   {
-    "directive": "LimitExcept",
-    "expected": "GET POST OPTIONS",
-    "severity": "high",
-    "description": "Restreindre les méthodes de requête HTTP non nécessaires. Cette configuration limite les méthodes HTTP autorisées aux seules essentielles pour le fonctionnement web standard, éliminant les risques associés aux méthodes potentiellement dangereuses comme PUT, DELETE ou TRACE.",
-    "file": "/etc/apache2/conf-available/security.conf",
-    "source": "5.7 https://www.itsecure.hu/wp-content/uploads/2023/12/DRAFT_CIS_Apache_HTTP_Server_2.4_Benchmark_v2.0.0.pdf"
+  "directive": "LimitExcept",
+  "expected": "GET POST OPTIONS",
+  "severity": "high",
+  "description": "Restreindre les méthodes de requête HTTP non nécessaires. Cette configuration limite les méthodes HTTP autorisées aux seules essentielles pour le fonctionnement web standard, éliminant les risques associés aux méthodes potentiellement dangereuses comme PUT, DELETE ou TRACE.",
+  "file": "/etc/apache2/conf-available/security.conf",
+  "source": "AS24-U2-000590 https://public.cyber.mil/stigs/downloads/ (STIG Apache Server 2.4 Unix Site v2r6, 2025)"
   },
   {
-    "directive": "TraceEnable",
-    "expected": "off",
-    "severity": "high",
-    "description": "Désactiver la méthode HTTP TRACE pour prévenir les abus de diagnostic. Cette méthode peut être exploitée dans des attaques de cross-site scripting (XSS) et pour contourner certaines protections de sécurité des navigateurs.",
-    "file": "/etc/apache2/conf-available/security.conf",
-    "source": "5.8 https://www.itsecure.hu/wp-content/uploads/2023/12/DRAFT_CIS_Apache_HTTP_Server_2.4_Benchmark_v2.0.0.pdf"
+  "directive": "TraceEnable",
+  "expected": "off",
+  "severity": "high",
+  "description": "Désactiver la méthode HTTP TRACE pour prévenir les abus de diagnostic. Cette méthode peut être exploitée dans des attaques de cross-site scripting (XSS) et pour contourner certaines protections de sécurité des navigateurs.",
+  "file": "/etc/apache2/conf-available/security.conf",
+  "source": "AS24-U2-000590 https://public.cyber.mil/stigs/downloads/ (STIG Apache Server 2.4 Unix Site v2r6, 2025)"
   },
   {
-    "directive": "FilesMatch",
-    "expected": "^\\.ht",
-    "severity": "high",
-    "description": "Restreindre l'accès aux fichiers .ht*. Cette configuration protège les fichiers de configuration Apache comme .htaccess, .htpasswd contre l'accès direct via le web, empêchant ainsi la divulgation d'informations de configuration sensibles.",
-    "file": "/etc/apache2/conf-available/security.conf",
-    "source": "5.10 https://www.itsecure.hu/wp-content/uploads/2023/12/DRAFT_CIS_Apache_HTTP_Server_2.4_Benchmark_v2.0.0.pdf"
+  "directive": "FilesMatch",
+  "expected": "^\\.ht",
+  "severity": "high",
+  "description": "Restreindre l'accès aux fichiers .ht*. Cette configuration protège les fichiers de configuration Apache comme .htaccess, .htpasswd contre l'accès direct via le web, empêchant ainsi la divulgation d'informations de configuration sensibles.",
+  "file": "/etc/apache2/conf-available/security.conf",
+  "source": "AS24-U2-000310 https://public.cyber.mil/stigs/downloads/ (STIG Apache Server 2.4 Unix Site v2r6, 2025)"
   },
   {
-    "directive": "LimitRequestLine",
-    "expected": "512",
-    "severity": "medium",
-    "description": "Limiter la taille de la ligne de requête HTTP pour prévenir les débordements de tampon. Cette restriction protège contre les attaques par déni de service et les tentatives d'exploitation de vulnérabilités liées à la gestion de requêtes excessivement longues.",
-    "file": "/etc/apache2/apache2.conf",
-    "source": "10.1 https://www.itsecure.hu/wp-content/uploads/2023/12/DRAFT_CIS_Apache_HTTP_Server_2.4_Benchmark_v2.0.0.pdf"
+  "directive": "LimitRequestLine",
+  "expected": "512",
+  "severity": "medium",
+  "description": "Limiter la taille de la ligne de requête HTTP pour prévenir les débordements de tampon. Cette restriction protège contre les attaques par déni de service et les tentatives d'exploitation de vulnérabilités liées à la gestion de requêtes excessivement longues.",
+  "file": "/etc/apache2/apache2.conf",
+  "source": "AS24-U2-000590 https://public.cyber.mil/stigs/downloads/ (STIG Apache Server 2.4 Unix Site v2r6, 2025)"
   },
   {
-    "directive": "LimitRequestFields",
-    "expected": "100",
-    "severity": "medium",
-    "description": "Limiter le nombre de champs de requête HTTP. Cette restriction prévient les attaques par consommation de ressources où un attaquant tenterait de surcharger le serveur avec un nombre excessif d'en-têtes HTTP.",
-    "file": "/etc/apache2/apache2.conf",
-    "source": "10.2 https://www.itsecure.hu/wp-content/uploads/2023/12/DRAFT_CIS_Apache_HTTP_Server_2.4_Benchmark_v2.0.0.pdf"
+  "directive": "LimitRequestFields",
+  "expected": "100",
+  "severity": "medium",
+  "description": "Limiter le nombre de champs de requête HTTP. Cette restriction prévient les attaques par consommation de ressources où un attaquant tenterait de surcharger le serveur avec un nombre excessif d'en-têtes HTTP.",
+  "file": "/etc/apache2/apache2.conf",
+  "source": "AS24-U2-000590 https://public.cyber.mil/stigs/downloads/ (STIG Apache Server 2.4 Unix Site v2r6, 2025)"
   },
   {
-    "directive": "LimitRequestFieldsize",
-    "expected": "1024",
-    "severity": "medium",
-    "description": "Limiter la taille des champs de requête HTTP. Cette configuration contrôle la taille maximale des en-têtes individuels, protégeant contre les tentatives d'exploitation par injection d'en-têtes volumineux ou malformés.",
-    "file": "/etc/apache2/apache2.conf",
-    "source": "10.3 https://www.itsecure.hu/wp-content/uploads/2023/12/DRAFT_CIS_Apache_HTTP_Server_2.4_Benchmark_v2.0.0.pdf"
+  "directive": "LimitRequestFieldsize",
+  "expected": "1024",
+  "severity": "medium",
+  "description": "Limiter la taille des champs de requête HTTP. Cette configuration contrôle la taille maximale des en-têtes individuels, protégeant contre les tentatives d'exploitation par injection d'en-têtes volumineux ou malformés.",
+  "file": "/etc/apache2/apache2.conf",
+  "source": "AS24-U2-000590 https://public.cyber.mil/stigs/downloads/ (STIG Apache Server 2.4 Unix Site v2r6, 2025)"
   },
   {
-    "directive": "LimitRequestBody",
-    "expected": "102400",
-    "severity": "medium",
-    "description": "Limiter la taille du corps de requête HTTP à 100KB. Cette restriction protège contre les attaques par déni de service basées sur l'upload de fichiers volumineux et aide à contrôler l'utilisation des ressources du serveur lors du traitement des requêtes POST.",
-    "file": "/etc/apache2/apache2.conf",
-    "source": "10.4 https://www.itsecure.hu/wp-content/uploads/2023/12/DRAFT_CIS_Apache_HTTP_Server_2.4_Benchmark_v2.0.0.pdf"
+  "directive": "LimitRequestBody",
+  "expected": "102400",
+  "severity": "medium",
+  "description": "Limiter la taille du corps de requête HTTP à 100KB. Cette restriction protège contre les attaques par déni de service basées sur l'upload de fichiers volumineux et aide à contrôler l'utilisation des ressources du serveur lors du traitement des requêtes POST.",
+  "file": "/etc/apache2/apache2.conf",
+  "source": "AS24-U2-000590 https://public.cyber.mil/stigs/downloads/ (STIG Apache Server 2.4 Unix Site v2r6, 2025)"
   }
 ]

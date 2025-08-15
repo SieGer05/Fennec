@@ -1,9 +1,12 @@
 import { useState } from "react";
+import { useNavigate } from 'react-router-dom';
 
 function AuditingTable({ audits, loading, error }) {
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 3;
     const totalPages = Math.ceil(audits.length / itemsPerPage);
+
+    const navigate = useNavigate();
 
     const currentItems = audits.slice(
         (currentPage - 1) * itemsPerPage,
@@ -63,6 +66,10 @@ function AuditingTable({ audits, loading, error }) {
                 )}
             </div>
         );
+    };
+
+    const handleGoBack = () => {
+      navigate(`/agents/`);
     };
 
     if (loading) {
@@ -265,6 +272,16 @@ function AuditingTable({ audits, loading, error }) {
                         </a>
                     </div>
                 ))}
+            </div>
+
+            <div className="flex justify-center mt-6">
+                <button 
+                    className="border-none bg-purple-600 text-white px-4 py-2 rounded-xl
+                        hover:bg-purple-800 cursor-pointer"
+                    onClick={handleGoBack}
+                >
+                    Page précédente
+                </button>
             </div>
         </div>
     );
