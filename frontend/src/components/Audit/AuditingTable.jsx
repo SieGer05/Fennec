@@ -36,6 +36,15 @@ function AuditingTable({ audits, loading, error }) {
         return styles[severity.toLowerCase()] || 'bg-gray-100 text-gray-800';
     };
 
+    // Helper function to extract URL from source string
+    const extractUrl = (source) => {
+        if (!source) return '#';
+        
+        // Look for http or https URL in the source string
+        const urlMatch = source.match(/(https?:\/\/[^\s]+)/);
+        return urlMatch ? urlMatch[1] : '#';
+    };
+
     const TruncatedText = ({ text, maxLength = 20 }) => {
         if (!text) return null;
         
@@ -70,7 +79,7 @@ function AuditingTable({ audits, loading, error }) {
     if (error) {
         return (
             <div className="mt-8 bg-red-50 border border-red-200 rounded-lg p-4">
-                <h3 className="text-red-800 font-medium mb-2">Erreur d’audit</h3>
+                <h3 className="text-red-800 font-medium mb-2">Erreur d'audit</h3>
                 <p className="text-red-700">{error}</p>
                 <button
                     className="mt-3 bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-lg transition-colors"
@@ -187,7 +196,7 @@ function AuditingTable({ audits, loading, error }) {
                         
                         <div className="mt-3 pt-3 border-t border-gray-100">
                             <a 
-                                href={audit.source} 
+                                href={extractUrl(audit.source)} 
                                 target="_blank" 
                                 rel="noopener noreferrer"
                                 className="text-sm text-purple-600 hover:underline inline-flex items-center"
@@ -244,7 +253,7 @@ function AuditingTable({ audits, loading, error }) {
                         </h4>
                         <p className="text-sm text-gray-600 mb-2">{audit.description}</p>
                         <a 
-                            href={audit.source} 
+                            href={extractUrl(audit.source)} 
                             target="_blank" 
                             rel="noopener noreferrer"
                             className="text-sm text-purple-600 hover:underline inline-flex items-center"

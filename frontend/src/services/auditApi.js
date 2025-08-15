@@ -15,3 +15,10 @@ export const fetchSSHConfiguration = async (agentId) => {
     );
     return data;
 };
+
+export const fetchApache2Configuration = async (agentId) => {
+    const { data } = await api.get(
+        `${AUDIT_BASE}/agents/${agentId}/apache2-configuration`
+    );
+    return data;
+}

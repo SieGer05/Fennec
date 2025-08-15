@@ -4,6 +4,7 @@ from ..database import get_db
 from ..services.agent_service import AgentService
 from ..services.ssh_manager import ssh_cache
 from ..services.ssh_audit import SSHAudit
+from ..services.apache2_audit import Apache2Audit
 
 router = APIRouter(prefix="/audit", tags=["Audit"])
 
@@ -37,4 +38,24 @@ def audit_ssh_configuration(agent_id: int, db: Session = Depends(get_db)):
         raise HTTPException(
             status_code=500, 
             detail=f"SSH audit failed: {str(e)}"
+        )
+
+@router.get("/agents/{agent_id}/apache2-configuration")
+def audit_apache2_configuration(agent_id: int, db: Session = Depends(get_db)):
+    agent_service = AgentService(db)
+    agent = agent_service.get_agent_credentials(agent_id)
+    
+    if not agent:
+        raise HTTPException(status_code=404, detail="Agent not found")
+
+    try:
+        with ssh_cache.get_connection(agent) as ssh:
+            auditor = Apache2Audit()
+            results = auditor.audit_config(ssh)
+            return results
+            
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, 
+            detail=f"Apache2 audit failed: {str(e)}"
         )
