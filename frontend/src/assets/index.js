@@ -8,6 +8,9 @@ import Download from "./icons/download.svg"
 import View from "./icons/view.svg"
 import Delete from "./icons/delete.svg"
 import SadFox from "./images/sad_fox.png"
+import Linux from "./icons/linux.svg"
+import Windows from "./icons/windows.svg"
+import Macos from "./icons/macos.svg"
 
 export const IMAGES = {
    Logo,
@@ -23,4 +26,7 @@ export const ICONS = {
    Download,
    View,
    Delete,
+   Linux,
+   Windows,
+   Macos,
 };

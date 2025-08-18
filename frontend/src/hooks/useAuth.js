@@ -14,7 +14,7 @@ export function useAuth() {
         localStorage.setItem("isLoggedIn", "true");
         setIsLoggedIn(true);
 
-        navigate("/agents");
+        navigate("/guide");
     }
 
     const logout = () => {

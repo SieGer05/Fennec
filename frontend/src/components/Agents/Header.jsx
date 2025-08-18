@@ -11,7 +11,7 @@ function Header() {
    }
 
    return (
-      <div className="w-full border-b bordernp-purple-200 h-12 flex items-center px-4 bg-white relative">
+      <div className="w-full border-b border-purple-200 h-12 flex items-center px-4 bg-white relative">
          <img
             src={IMAGES.Logo}
             alt="Logo"

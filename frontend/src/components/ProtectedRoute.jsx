@@ -3,7 +3,7 @@ import DeviceError from "./DeviceError";
 import { isMobileOrTablet } from "../utils/isMobileOrTablet";
 
 function ProtectedRoute({ children }) {
-    const isLoggedIn = localStorage.getItem("isLoggedIn");
+    const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
     const isMobile = isMobileOrTablet();
 
     if (!isLoggedIn) {

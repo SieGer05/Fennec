@@ -5,6 +5,7 @@ import Login from "./pages/Login";
 import Agents from "./pages/Agents";
 import Audit from "./pages/Audit";
 import NotFound from "./components/NotFound";
+import Guide from "./pages/Guide";
 
 function App() {
   return (
@@ -14,6 +15,16 @@ function App() {
       <Routes>
         <Route path="/" element={<Navigate to="/login" replace />} />
         <Route path="/login" element={<Login />} />
+        
+        <Route 
+          path="/guide" 
+          element={
+            <ProtectedRoute>
+              <Guide />
+            </ProtectedRoute>
+          } 
+        />
+
         <Route 
           path="/agents" 
           element={
