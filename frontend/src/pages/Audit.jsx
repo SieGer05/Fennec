@@ -5,7 +5,8 @@ import {
   fetchAgentServices, 
   fetchSSHConfiguration, 
   fetchApache2Configuration,
-  fetchMariadbCOnfiguration, } from "../services";
+  fetchMariadbConfiguration,
+  fetchWebminConfiguration, } from "../services";
 import Header from "../components/Audit/Header";
 import AuditingTable from "../components/Audit/AuditingTable";
 
@@ -22,7 +23,8 @@ function Audit() {
   const expectedServices = [
     { name: 'ssh', display: 'SSH', fetchConfig: fetchSSHConfiguration },
     { name: 'apache2', display: 'Apache', fetchConfig: fetchApache2Configuration },
-    { name: 'mariadb', display: 'Maria DB', fetchConfig: fetchMariadbCOnfiguration },
+    { name: 'mariadb', display: 'Maria DB', fetchConfig: fetchMariadbConfiguration },
+    { name: 'webmin', display: 'Webmin', fetchConfig: fetchWebminConfiguration },
   ];
 
   useEffect(() => {

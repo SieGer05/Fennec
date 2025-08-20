@@ -23,9 +23,16 @@ export const fetchApache2Configuration = async (agentId) => {
     return data;
 }
 
-export const fetchMariadbCOnfiguration = async (agentId) => {
+export const fetchMariadbConfiguration = async (agentId) => {
     const { data } = await api.get(
         `${AUDIT_BASE}/agents/${agentId}/mariadb-configuration`   
+    );
+    return data;
+}
+
+export const fetchWebminConfiguration = async (agentId) => {
+    const { data } = await api.get(
+        `${AUDIT_BASE}/agents/${agentId}/webmin-configuration`   
     );
     return data;
 }

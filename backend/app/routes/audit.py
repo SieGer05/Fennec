@@ -89,3 +89,25 @@ def audit_mariadb_configuration(agent_id: int, db: Session = Depends(get_db)):
             status_code=500, 
             detail=f"MariaDB audit failed: {str(e)}"
         )
+
+from ..services.webmin_audit import WebminAudit
+
+@router.get("/agents/{agent_id}/webmin-configuration")
+def audit_webmin_configuration(agent_id: int, db: Session = Depends(get_db)):
+    agent_service = AgentService(db)
+    agent = agent_service.get_agent_credentials(agent_id)
+    
+    if not agent:
+        raise HTTPException(status_code=404, detail="Agent not found")
+
+    try:
+        with ssh_cache.get_connection(agent) as ssh:
+            auditor = WebminAudit()
+            results = auditor.audit_config(ssh)
+            return results
+            
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, 
+            detail=f"Webmin audit failed: {str(e)}"
+        )

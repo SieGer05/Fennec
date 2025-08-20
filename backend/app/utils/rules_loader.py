@@ -15,3 +15,8 @@ def load_mariadb_rules():
     rules_path = Path(__file__).resolve().parent.parent / "rules" / "mariadb_rules.json"
     with open(rules_path, "r", encoding="utf-8") as f:
         return json.load(f)
+    
+def load_webmin_rules():
+    rules_path = Path(__file__).resolve().parent.parent / "rules" / "webmin_rules.json"
+    with open(rules_path, "r", encoding="utf-8") as f:
+        return json.load(f)

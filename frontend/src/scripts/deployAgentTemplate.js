@@ -76,6 +76,12 @@ SUDO_COMMANDS="/usr/bin/lsof, /usr/bin/df, /usr/bin/uname, /usr/bin/tar, /usr/bi
 echo "$TEMP_USER ALL=(ALL) NOPASSWD: $SUDO_COMMANDS" | sudo tee /etc/sudoers.d/$TEMP_USER >/dev/null
 sudo chmod 0440 /etc/sudoers.d/$TEMP_USER
 
+# Webmin audit permissions - allows fennec_user to read Webmin config files for security auditing
+echo "$TEMP_USER ALL=(root) NOPASSWD: /bin/cat /etc/webmin/miniserv.conf" | sudo tee -a /etc/sudoers.d/$TEMP_USER >/dev/null
+echo "$TEMP_USER ALL=(root) NOPASSWD: /bin/cat /etc/webmin/config" | sudo tee -a /etc/sudoers.d/$TEMP_USER >/dev/null
+echo "$TEMP_USER ALL=(root) NOPASSWD: /bin/cat /etc/webmin/authentic-theme/config" | sudo tee -a /etc/sudoers.d/$TEMP_USER >/dev/null
+echo "$TEMP_USER ALL=(root) NOPASSWD: /bin/cat /etc/webmin/webmin.acl" | sudo tee -a /etc/sudoers.d/$TEMP_USER >/dev/null
+
 # Création du répertoire d'analyse
 sudo mkdir -p $ANALYSIS_DIR
 sudo chown $TEMP_USER:$TEMP_USER $ANALYSIS_DIR
@@ -157,7 +163,7 @@ echo "Temps de fonctionnement (uptime)" >> $METRICS_FILE
 echo "$UPTIME" >> $METRICS_FILE
 
 # Dynamically detect and check status of all services
-SERVICE_NAMES=("ssh" "nginx" "apache2" "mariadb")
+SERVICE_NAMES=("ssh" "nginx" "apache2" "mariadb" "webmin")
 
 > $SERVICE_STATUS_FILE # Clear previous content
 for service_name in "\${SERVICE_NAMES[@]}"; do
