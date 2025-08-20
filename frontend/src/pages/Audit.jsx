@@ -1,7 +1,11 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import ServiceStatus from "../components/Audit/ServiceStatus";
-import { fetchAgentServices, fetchSSHConfiguration, fetchApache2Configuration } from "../services";
+import { 
+  fetchAgentServices, 
+  fetchSSHConfiguration, 
+  fetchApache2Configuration,
+  fetchMariadbCOnfiguration, } from "../services";
 import Header from "../components/Audit/Header";
 import AuditingTable from "../components/Audit/AuditingTable";
 
@@ -18,6 +22,7 @@ function Audit() {
   const expectedServices = [
     { name: 'ssh', display: 'SSH', fetchConfig: fetchSSHConfiguration },
     { name: 'apache2', display: 'Apache', fetchConfig: fetchApache2Configuration },
+    { name: 'mariadb', display: 'Maria DB', fetchConfig: fetchMariadbCOnfiguration },
   ];
 
   useEffect(() => {

@@ -1,5 +1,4 @@
-export const generateDeployScript = (ip, port, publicKey) => {
-  return `#!/bin/bash
+#!/bin/bash
 # Script de déploiement d'agent
 # Nécessite les privilèges root
 
@@ -10,10 +9,10 @@ if [ "$(id -u)" != "0" ]; then
 fi
 
 # Configuration
-SERVER_IP="${ip.trim()}"
-SSH_PORT="${port.trim()}"
+SERVER_IP="192.168.11.107"
+SSH_PORT="22"
 TEMP_USER="fennec_user"
-PUBLIC_KEY="${publicKey}"
+PUBLIC_KEY="ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPNZOUajXUzM0DAa9mzSyr/Y3Zj0cNYYHRv/tKvmZE0F aminedjili29@gmail.com"
 ANALYSIS_DIR="/home/$TEMP_USER/analysis"
 LOCK_FILE="/tmp/agent_$TEMP_USER.lock"
 STATIC_INFO_FILE="$ANALYSIS_DIR/static_info.txt"
@@ -88,7 +87,7 @@ sudo -u $TEMP_USER bash -c '
     PUBLIC_IP=$(curl -s ifconfig.me)
     [ -z "$PUBLIC_IP" ] && PUBLIC_IP="Non disponible"
     
-    PRIVATE_IP=$(hostname -I | awk "{print \\$1}")
+    PRIVATE_IP=$(hostname -I | awk "{print \$1}")
     [ -z "$PRIVATE_IP" ] && PRIVATE_IP="Non disponible"
 
     VPN_ACTIVE="Non"
@@ -121,7 +120,7 @@ METRICS_FILE="$HOME/analysis/system_metrics.txt"
 SERVICE_STATUS_FILE="$HOME/analysis/service_status.txt"
 
 CPU_USAGE=$(top -bn1 | awk -F, '
-    /Cpu\(s\):/ {
+    /Cpu(s):/ {
         for(i=1; i<=NF; i++) { 
             if ($i ~ /id/) { 
                 gsub(/[^0-9.]/, "", $i)
@@ -148,11 +147,11 @@ DISK_TOTAL=$(echo $DISK_INFO | awk '{print $2}')
 UPTIME=$(uptime -p | sed 's/up //')
 
 echo "Utilisation du CPU" > $METRICS_FILE
-echo "\${CPU_USAGE}%" >> $METRICS_FILE
+echo "${CPU_USAGE}%" >> $METRICS_FILE
 echo "Utilisation de la mémoire" >> $METRICS_FILE
-echo "\${MEM_USED_GB} Go sur \${MEM_TOTAL_GB} Go" >> $METRICS_FILE
+echo "${MEM_USED_GB} Go sur ${MEM_TOTAL_GB} Go" >> $METRICS_FILE
 echo "Espace disque libre" >> $METRICS_FILE
-echo "\${DISK_FREE} Go / \${DISK_TOTAL} Go" >> $METRICS_FILE
+echo "${DISK_FREE} Go / ${DISK_TOTAL} Go" >> $METRICS_FILE
 echo "Temps de fonctionnement (uptime)" >> $METRICS_FILE
 echo "$UPTIME" >> $METRICS_FILE
 
@@ -160,7 +159,7 @@ echo "$UPTIME" >> $METRICS_FILE
 SERVICE_NAMES=("ssh" "nginx" "apache2" "mariadb")
 
 > $SERVICE_STATUS_FILE # Clear previous content
-for service_name in "\${SERVICE_NAMES[@]}"; do
+for service_name in "${SERVICE_NAMES[@]}"; do
     if systemctl list-unit-files --type=service | grep -q "^$service_name.service"; then
         if systemctl is-active --quiet "$service_name"; then
             echo "$service_name active" >> $SERVICE_STATUS_FILE
@@ -205,5 +204,3 @@ echo "[SUCCESS] Déploiement terminé"
 echo "Utilisateur: $TEMP_USER"
 echo "Commande: ssh -p $SSH_PORT $TEMP_USER@$SERVER_IP"
 echo "======================================"
-`;
-};
