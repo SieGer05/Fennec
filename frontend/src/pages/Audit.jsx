@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useParams } from "react-router-dom";
 import ServiceStatus from "../components/Audit/ServiceStatus";
 import { 
@@ -6,9 +6,12 @@ import {
   fetchSSHConfiguration, 
   fetchApache2Configuration,
   fetchMariadbConfiguration,
-  fetchWebminConfiguration, } from "../services";
+  fetchWebminConfiguration, 
+} from "../services";
 import Header from "../components/Audit/Header";
 import AuditingTable from "../components/Audit/AuditingTable";
+import ChatBot from "../components/Chatbot/ChatBot";
+import ChatBotButton from "../components/Chatbot/ChatbotButton";
 
 function Audit() {
   const { agentId } = useParams();
@@ -19,6 +22,9 @@ function Audit() {
   const [allAudits, setAllAudits] = useState([]);
   const [auditsLoading, setAuditsLoading] = useState(false);
   const [auditsError, setAuditsError] = useState(null);
+  
+  const [showChatButton, setShowChatButton] = useState(false);
+  const [isChatOpen, setIsChatOpen] = useState(false);
 
   const expectedServices = [
     { name: 'ssh', display: 'SSH', fetchConfig: fetchSSHConfiguration },
@@ -26,6 +32,10 @@ function Audit() {
     { name: 'mariadb', display: 'Maria DB', fetchConfig: fetchMariadbConfiguration },
     { name: 'webmin', display: 'Webmin', fetchConfig: fetchWebminConfiguration },
   ];
+
+  const failedAudits = useMemo(() => {
+    return allAudits.filter(audit => !audit.passed);
+  }, [allAudits]);
 
   useEffect(() => {
     const loadServices = async () => {
@@ -48,6 +58,14 @@ function Audit() {
 
     loadServices();
   }, [agentId]);
+
+  useEffect(() => {
+    const chatTimer = setTimeout(() => {
+      setShowChatButton(true);
+    }, 30000);
+
+    return () => clearTimeout(chatTimer);
+  }, []);
 
   useEffect(() => {
     const fetchAllAudits = async () => {
@@ -94,9 +112,15 @@ function Audit() {
         <div className="bg-white w-[90%] rounded-xl shadow p-6 min-h-[80vh] flex items-center justify-center">
           <div className="flex flex-col items-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-700 mb-4"></div>
-            <p className="text-purple-800 font-mono">Chargement des données de service depuis l’agent...</p>
+            <p className="text-purple-800 font-mono">Chargement des données de service depuis l'agent...</p>
           </div>
         </div>
+        {showChatButton && !isChatOpen && (
+          <ChatBotButton onClick={() => setIsChatOpen(true)} />
+        )}
+        {isChatOpen && (
+          <ChatBot isOpen={isChatOpen} onClose={() => setIsChatOpen(false)} />
+        )}
       </div>
     );
   }
@@ -116,6 +140,12 @@ function Audit() {
             Réessayer la connexion
           </button>
         </div>
+        {showChatButton && !isChatOpen && (
+          <ChatBotButton onClick={() => setIsChatOpen(true)} />
+        )}
+        {isChatOpen && (
+          <ChatBot isOpen={isChatOpen} onClose={() => setIsChatOpen(false)} />
+        )}
       </div>
     );
   }
@@ -137,6 +167,17 @@ function Audit() {
           />
         )}
       </div>
+      
+      {showChatButton && !isChatOpen && (
+        <ChatBotButton onClick={() => setIsChatOpen(true)} />
+      )}
+      {isChatOpen && (
+        <ChatBot 
+          isOpen={isChatOpen} 
+          onClose={() => setIsChatOpen(false)}
+          failedAudits={failedAudits}
+        />
+      )}
     </div>
   );
 }

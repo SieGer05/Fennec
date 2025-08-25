@@ -4,3 +4,6 @@ sqlalchemy
 passlib[bcrypt]
 paramiko
 pydantic-settings
+python-dotenv
+openai
+python-multipart

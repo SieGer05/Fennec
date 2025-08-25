@@ -36,3 +36,11 @@ export const fetchWebminConfiguration = async (agentId) => {
     );
     return data;
 }
+
+export const analyzeAudit = async (auditData) => {
+    const { data } = await api.post(
+        `${AUDIT_BASE}/analyze-audit`,
+        { audits: auditData }
+    );
+    return data;
+};

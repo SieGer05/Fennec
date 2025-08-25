@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from typing import List, Any
 
 class UserLogin(BaseModel):
    username: str
@@ -24,3 +25,6 @@ class AgentCredential(AgentCredentialBase):
 
    class Config:
       from_attributes = True
+
+class AuditRequest(BaseModel):
+   audits: List[Any]

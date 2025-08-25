@@ -3,175 +3,84 @@
         "directive": "PermitRootLogin",
         "expected": "no",
         "severity": "high",
-        "description": "Désactiver la connexion directe de l’utilisateur root empêche les attaques par force brute ciblant ce compte privilégié, renforçant ainsi la sécurité globale du système.",
+        "description": "Disabling direct root login prevents brute force attacks targeting this privileged account, significantly strengthening overall system security.",
         "source": "https://www.cisecurity.org/benchmark/ubuntu_linux"
     },
     {
         "directive": "PasswordAuthentication",
         "expected": "no",
         "severity": "high",
-        "description": "Désactiver l’authentification par mot de passe oblige l’utilisation de méthodes plus sécurisées comme l’authentification par clé SSH, réduisant fortement le risque d’attaques basées sur le vol ou le devinage de mots de passe.",
-        "source": "https://www.cisecurity.org/benchmark/ubuntu_linux"
-    },
-    {
-        "directive": "Protocol",
-        "expected": "2",
-        "severity": "high",
-        "description": "Limiter SSH uniquement à la version 2 du protocole assure une protection contre les vulnérabilités connues de la version 1, obsolète et peu sécurisée.",
-        "source": "https://www.cisecurity.org/benchmark/ubuntu_linux"
-    },
-    {
-        "directive": "LogLevel",
-        "expected": "INFO",
-        "severity": "medium",
-        "description": "Régler le niveau de journalisation sur INFO permet de collecter les événements essentiels liés aux connexions pour la surveillance et l’audit de sécurité.",
-        "source": "https://www.cisecurity.org/benchmark/ubuntu_linux"
-    },
-    {
-        "directive": "X11Forwarding",
-        "expected": "no",
-        "severity": "medium",
-        "description": "Désactiver le transfert X11 réduit le risque de compromission d’un serveur X11 distant et diminue la surface d’attaque potentielle.",
-        "source": "https://www.cisecurity.org/benchmark/ubuntu_linux"
-    },
-    {
-        "directive": "MaxAuthTries",
-        "expected": "4",
-        "severity": "high",
-        "description": "Limiter le nombre de tentatives d’authentification à 4 réduit les risques d’attaques par force brute sur les identifiants des utilisateurs.",
-        "source": "https://www.cisecurity.org/benchmark/ubuntu_linux"
-    },
-    {
-        "directive": "IgnoreRhosts",
-        "expected": "yes",
-        "severity": "medium",
-        "description": "Activer IgnoreRhosts désactive l’authentification basée sur les fichiers .rhosts/.shosts, forçant l’utilisation d’une authentification par mot de passe ou clé plus sécurisée.",
-        "source": "https://www.cisecurity.org/benchmark/ubuntu_linux"
-    },
-    {
-        "directive": "HostbasedAuthentication",
-        "expected": "no",
-        "severity": "medium",
-        "description": "Désactiver l’authentification basée sur l’hôte protège contre les méthodes d’authentification basées sur .rhosts, connues pour être peu fiables et vulnérables.",
+        "description": "Disabling password authentication enforces the use of more secure methods like SSH key authentication, greatly reducing risks from password-based attacks.",
         "source": "https://www.cisecurity.org/benchmark/ubuntu_linux"
     },
     {
         "directive": "PermitEmptyPasswords",
         "expected": "no",
         "severity": "high",
-        "description": "Interdire l’utilisation de comptes sans mot de passe empêche tout accès non autorisé à des comptes vides, ce qui est une mesure de sécurité critique.",
+        "description": "Preventing empty password accounts blocks unauthorized access to accounts without passwords, which is a critical security measure.",
         "source": "https://www.cisecurity.org/benchmark/ubuntu_linux"
     },
     {
-        "directive": "PermitUserEnvironment",
+        "directive": "MaxAuthTries",
+        "expected": "3",
+        "severity": "high",
+        "description": "Limiting authentication attempts to 3 reduces brute force attack opportunities while being practical for legitimate users.",
+        "source": "https://www.cisecurity.org/benchmark/ubuntu_linux"
+    },
+    {
+        "directive": "LoginGraceTime",
+        "expected": "30",
+        "severity": "high",
+        "description": "Setting a 30-second authentication timeout reduces exposure to slowloris-style attacks and frees up connection slots faster.",
+        "source": "https://www.cisecurity.org/benchmark/ubuntu_linux"
+    },
+    {
+        "directive": "PubkeyAuthentication",
+        "expected": "yes",
+        "severity": "high",
+        "description": "Enabling public key authentication provides a more secure authentication method than passwords and is essential when password authentication is disabled.",
+        "source": "https://www.cisecurity.org/benchmark/ubuntu_linux"
+    },
+    {
+        "directive": "X11Forwarding",
         "expected": "no",
         "severity": "medium",
-        "description": "Désactiver PermitUserEnvironment empêche les utilisateurs de définir des variables d’environnement pouvant contourner ou affaiblir les contrôles de sécurité en place.",
-        "source": "https://www.cisecurity.org/benchmark/ubuntu_linux"
-    },
-    {
-        "directive": "Ciphers",
-        "expected": "chacha20-poly1305@openssh.com,aes256-gcm@openssh.com,aes256-ctr,aes192-ctr,aes128-gcm@openssh.com,aes128-ctr",
-        "severity": "high",
-        "description": "Utiliser des chiffrements forts garantit que le transfert de données reste sécurisé contre les attaques cryptographiques connues. Inclut aes192-ctr pour une meilleure compatibilité avec certains clients.",
-        "source": "https://www.sshaudit.com/hardening_guides.html"
-    },
-    {
-        "directive": "MACs",
-        "expected": "hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com,umac-128-etm@openssh.com",
-        "severity": "high",
-        "description": "Utiliser des algorithmes MAC robustes avec le mode « encrypt-then-MAC » assure l’intégrité et l’authenticité des données échangées via SSH.",
-        "source": "https://www.sshaudit.com/hardening_guides.html"
-    },
-    {
-        "directive": "KexAlgorithms",
-        "expected": "curve25519-sha256,curve25519-sha256@libssh.org,sntrup761x25519-sha512@openssh.com,ecdh-sha2-nistp521,ecdh-sha2-nistp384,ecdh-sha2-nistp256",
-        "severity": "high",
-        "description": "Utiliser des algorithmes d’échange de clés robustes, incluant le post-quantique sntrup761x25519, garantit un établissement de clé sécurisé pour les sessions SSH.",
-        "source": "https://www.sshaudit.com/hardening_guides.html"
-    },
-    {
-        "directive": "RequiredRSASize",
-        "expected": "3072",
-        "severity": "high",
-        "description": "Imposer une taille minimale de clé RSA de 3072 bits empêche l’utilisation de clés faibles pouvant être cassées par des attaques avancées.",
-        "source": "https://www.sshaudit.com/hardening_guides.html"
-    },
-    {
-        "directive": "AllowUsers",
-        "expected": "<specific_users>",
-        "severity": "high",
-        "description": "Restreint l’accès SSH à une liste précise d’utilisateurs, réduisant ainsi la surface d’attaque en limitant les comptes autorisés à se connecter.",
-        "source": "https://www.cisecurity.org/benchmark/ubuntu_linux"
-    },
-    {
-        "directive": "AllowGroups",
-        "expected": "<specific_groups>",
-        "severity": "high",
-        "description": "Restreint l’accès SSH à certains groupes d’utilisateurs, renforçant le contrôle d’accès basé sur l’appartenance à un groupe.",
-        "source": "https://www.cisecurity.org/benchmark/ubuntu_linux"
-    },
-    {
-        "directive": "DenyUsers",
-        "expected": "<specific_users>",
-        "severity": "high",
-        "description": "Refuse explicitement l’accès SSH à certains utilisateurs, garantissant qu’ils ne peuvent pas se connecter même si leur compte est actif.",
-        "source": "https://www.cisecurity.org/benchmark/ubuntu_linux"
-    },
-    {
-        "directive": "DenyGroups",
-        "expected": "<specific_groups>",
-        "severity": "high",
-        "description": "Refuse explicitement l’accès SSH à certains groupes, empêchant tout membre de ces groupes de se connecter au système.",
+        "description": "Disabling X11 forwarding reduces attack surface by preventing potential exploitation of X11 server vulnerabilities through SSH tunnels.",
         "source": "https://www.cisecurity.org/benchmark/ubuntu_linux"
     },
     {
         "directive": "MaxStartups",
         "expected": "10:30:60",
         "severity": "medium",
-        "description": "Limite le nombre de connexions non authentifiées simultanées afin de prévenir les attaques par déni de service sur le service SSH.",
-        "source": "https://www.cisecurity.org/benchmark/ubuntu_linux"
-    },
-    {
-        "directive": "LoginGraceTime",
-        "expected": "60",
-        "severity": "high",
-        "description": "Limite le délai accordé pour finaliser l’authentification, réduisant ainsi les opportunités pour des attaques par force brute.",
+        "description": "Limiting concurrent unauthenticated connections prevents SSH service denial of service attacks while allowing legitimate connection bursts.",
         "source": "https://www.cisecurity.org/benchmark/ubuntu_linux"
     },
     {
         "directive": "ClientAliveInterval",
         "expected": "300",
         "severity": "medium",
-        "description": "Définit l’intervalle de vérification de l’activité du client, permettant de fermer les sessions inactives et libérer les ressources.",
+        "description": "Setting client keepalive to 5 minutes helps detect dead connections and prevents resource exhaustion from abandoned sessions.",
         "source": "https://www.cisecurity.org/benchmark/ubuntu_linux"
     },
     {
         "directive": "ClientAliveCountMax",
-        "expected": "3",
+        "expected": "2",
         "severity": "medium",
-        "description": "Définit le nombre maximum de messages keepalive pouvant être envoyés sans réponse avant la déconnexion, améliorant la sécurité des sessions.",
+        "description": "Limiting keepalive retries to 2 ensures timely cleanup of unresponsive connections while being tolerant of network issues.",
         "source": "https://www.cisecurity.org/benchmark/ubuntu_linux"
     },
     {
         "directive": "PermitTunnel",
         "expected": "no",
         "severity": "medium",
-        "description": "Désactive le tunneling SSH, qui pourrait être utilisé pour contourner des restrictions réseau ou exposer des services internes sensibles.",
+        "description": "Disabling SSH tunneling prevents potential bypass of network security controls and exposure of internal services.",
         "source": "https://www.cisecurity.org/benchmark/ubuntu_linux"
     },
     {
-        "directive": "UsePAM",
-        "expected": "yes",
-        "severity": "high",
-        "description": "Active l’intégration PAM, offrant la possibilité d’utiliser des méthodes d’authentification supplémentaires et une meilleure gestion des sessions.",
-        "source": "https://www.cisecurity.org/benchmark/ubuntu_linux"
-    },
-    {
-        "directive": "ChallengeResponseAuthentication",
-        "expected": "no",
-        "severity": "high",
-        "description": "Désactive l’authentification challenge-réponse, jugée moins sécurisée et vulnérable à certains types d’attaques.",
+        "directive": "LogLevel",
+        "expected": "INFO",
+        "severity": "low",
+        "description": "Setting log level to INFO captures essential connection events for security monitoring and forensic analysis without excessive verbosity.",
         "source": "https://www.cisecurity.org/benchmark/ubuntu_linux"
     }
 ]

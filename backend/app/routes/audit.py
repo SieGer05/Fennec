@@ -1,11 +1,15 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
+
 from ..database import get_db
 from ..services.agent_service import AgentService
 from ..services.ssh_manager import ssh_cache
 from ..services.ssh_audit import SSHAudit
 from ..services.apache2_audit import Apache2Audit
 from ..services.mariadb_audit import MariaDBAudit
+
+from ..schemas import AuditRequest
+from ..services.ai_analyzer import analyze_security_audit
 
 router = APIRouter(prefix="/audit", tags=["Audit"])
 
@@ -110,4 +114,27 @@ def audit_webmin_configuration(agent_id: int, db: Session = Depends(get_db)):
         raise HTTPException(
             status_code=500, 
             detail=f"Webmin audit failed: {str(e)}"
+        )
+
+@router.post("/analyze-audit")
+def analyze_audit_results(request: AuditRequest, db: Session = Depends(get_db)):
+    """
+    Analyze security audit findings using AI
+    """
+    try:
+        if not request.audits:
+            raise HTTPException(status_code=400, detail="No audit data provided")
+        
+        analysis_result = analyze_security_audit(request.audits)
+        
+        response_data = {"analysis": analysis_result}
+        return response_data
+        
+    except HTTPException:
+        raise
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, 
+            detail=f"AI analysis failed: {str(e)}"
         )

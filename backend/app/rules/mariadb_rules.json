@@ -1,202 +1,42 @@
 [
   {
-    "directive": "bind_address",
-    "expected": "127.0.0.1",
-    "severity": "high",
-    "description": "Restricts the MariaDB server to listen only on the localhost interface, preventing unauthorized remote access unless explicitly needed for the deployment.",
-    "file": "/etc/mysql/mariadb.conf.d/50-server.cnf",
-    "source": "https://mariadb.com/docs/platform/mariadb-platform-quickstart-guides/security"
+      "directive": "bind-address",
+      "expected": "127.0.0.1",
+      "severity": "high",
+      "description": "Restricts MariaDB server to listen only on localhost interface, preventing unauthorized remote access unless explicitly needed for deployment.",
+      "file": "/etc/mysql/mariadb.conf.d/50-server.cnf",
+      "source": "https://mariadb.com/docs/security/data-in-transit-encryption/"
   },
   {
-    "directive": "skip_name_resolve",
-    "expected": "ON",
-    "severity": "medium",
-    "description": "Disables DNS name resolution for client connections, reducing potential delays and vulnerabilities from DNS lookup failures or spoofing.",
-    "file": "/etc/mysql/mariadb.conf.d/50-server.cnf",
-    "source": "https://mariadb.com/kb/en/server-system-variables/#skip_name_resolve"
+      "directive": "local_infile",
+      "expected": "OFF",
+      "severity": "high",
+      "description": "Disables LOCAL INFILE option to prevent clients from loading local files onto the server, mitigating risks of unauthorized file access and data exfiltration.",
+      "file": "/etc/mysql/mariadb.conf.d/50-server.cnf",
+      "source": "https://mariadb.com/docs/security/data-in-transit-encryption/"
   },
   {
-    "directive": "local_infile",
-    "expected": "OFF",
-    "severity": "high",
-    "description": "Disables the LOCAL INFILE option to prevent clients from loading local files onto the server, mitigating risks of unauthorized file access.",
-    "file": "/etc/mysql/mariadb.conf.d/50-server.cnf",
-    "source": "https://mariadb.com/docs/platform/mariadb-platform-quickstart-guides/security"
+      "directive": "allow_suspicious_udfs",
+      "expected": "OFF",
+      "severity": "high",
+      "description": "Prevents loading of user-defined functions without proper init/deinit symbols, reducing risks from malicious or faulty UDFs that could compromise server security.",
+      "file": "/etc/mysql/mariadb.conf.d/50-server.cnf",
+      "source": "https://mariadb.com/kb/en/server-system-variables/#allow_suspicious_udfs"
   },
   {
-    "directive": "require_secure_transport",
-    "expected": "ON",
-    "severity": "high",
-    "description": "Enforces the use of secure (SSL/TLS) connections for all clients, protecting data in transit from eavesdropping and man-in-the-middle attacks.",
-    "file": "/etc/mysql/mariadb.conf.d/50-server.cnf",
-    "source": "https://mariadb.com/kb/en/server-system-variables/#require_secure_transport"
+      "directive": "general_log",
+      "expected": "OFF",
+      "severity": "low",
+      "description": "Disables general query logging in production to avoid performance overhead while maintaining security through other logging mechanisms.",
+      "file": "/etc/mysql/mariadb.conf.d/50-server.cnf",
+      "source": "https://mariadb.com/kb/en/server-system-variables/#general_log"
   },
   {
-    "directive": "ssl_ca",
-    "expected": "/etc/mysql/cacert.pem",
-    "severity": "high",
-    "description": "Specifies the path to the Certificate Authority file for SSL/TLS encryption, enabling secure connections; replace with actual path to valid CA.",
-    "file": "/etc/mysql/mariadb.conf.d/50-server.cnf",
-    "source": "https://mariadb.com/docs/platform/mariadb-platform-quickstart-guides/security"
-  },
-  {
-    "directive": "ssl_cert",
-    "expected": "/etc/mysql/server-cert.pem",
-    "severity": "high",
-    "description": "Specifies the path to the server certificate file for SSL/TLS encryption; replace with actual path to valid certificate.",
-    "file": "/etc/mysql/mariadb.conf.d/50-server.cnf",
-    "source": "https://mariadb.com/docs/platform/mariadb-platform-quickstart-guides/security"
-  },
-  {
-    "directive": "ssl_key",
-    "expected": "/etc/mysql/server-key.pem",
-    "severity": "high",
-    "description": "Specifies the path to the server private key file for SSL/TLS encryption; replace with actual path to valid key.",
-    "file": "/etc/mysql/mariadb.conf.d/50-server.cnf",
-    "source": "https://mariadb.com/docs/platform/mariadb-platform-quickstart-guides/security"
-  },
-  {
-    "directive": "default_password_lifetime",
-    "expected": "90",
-    "severity": "medium",
-    "description": "Sets the global password expiration policy to 90 days, ensuring regular password changes to reduce the risk of compromised credentials.",
-    "file": "/etc/mysql/mariadb.conf.d/50-server.cnf",
-    "source": "https://mariadb.com/kb/en/server-system-variables/#default_password_lifetime"
-  },
-  {
-    "directive": "disconnect_on_expired_password",
-    "expected": "ON",
-    "severity": "medium",
-    "description": "Disconnects clients with expired passwords that are not aware of sandbox mode, enhancing security by preventing use of expired credentials.",
-    "file": "/etc/mysql/mariadb.conf.d/50-server.cnf",
-    "source": "https://mariadb.com/kb/en/server-system-variables/#disconnect_on_expired_password"
-  },
-  {
-    "directive": "allow_suspicious_udfs",
-    "expected": "OFF",
-    "severity": "high",
-    "description": "Prevents loading of user-defined functions that do not have proper init/deinit symbols, reducing risks from malicious or faulty UDFs.",
-    "file": "/etc/mysql/mariadb.conf.d/50-server.cnf",
-    "source": "https://mariadb.com/kb/en/server-system-variables/#allow_suspicious_udfs"
-  },
-  {
-    "directive": "automatic_sp_privileges",
-    "expected": "OFF",
-    "severity": "medium",
-    "description": "Disables automatic granting of ALTER and EXECUTE privileges to stored procedure creators, requiring explicit privilege management for better control.",
-    "file": "/etc/mysql/mariadb.conf.d/50-server.cnf",
-    "source": "https://mariadb.com/kb/en/server-system-variables/#automatic_sp_privileges"
-  },
-  {
-    "directive": "encrypt_tmp_files",
-    "expected": "ON",
-    "severity": "high",
-    "description": "Enables automatic encryption of temporary files, enhancing data security by reducing the risk of data exposure from temporary storage.",
-    "file": "/etc/mysql/mariadb.conf.d/50-server.cnf",
-    "source": "https://mariadb.com/kb/en/server-system-variables/#encrypt_tmp_files"
-  },
-  {
-    "directive": "encryption_algorithm",
-    "expected": "aes_cbc",
-    "severity": "high",
-    "description": "Specifies the encryption algorithm for table encryption; aes_cbc is recommended for stronger security compared to none.",
-    "file": "/etc/mysql/mariadb.conf.d/50-server.cnf",
-    "source": "https://mariadb.com/kb/en/server-system-variables/#encryption_algorithm"
-  },
-  {
-    "directive": "server_audit_logging",
-    "expected": "ON",
-    "severity": "high",
-    "description": "Enables the MariaDB Audit Plugin for logging server activity, crucial for auditing and compliance.",
-    "file": "/etc/mysql/mariadb.conf.d/50-server.cnf",
-    "source": "https://mariadb.com/docs/platform/mariadb-platform-quickstart-guides/security"
-  },
-  {
-    "directive": "log_error",
-    "expected": "/var/log/mysql/error.log",
-    "severity": "medium",
-    "description": "Specifies the error log file path for recording server errors, essential for monitoring and troubleshooting stability issues.",
-    "file": "/etc/mysql/mariadb.conf.d/50-server.cnf",
-    "source": "https://mariadb.com/docs/platform/mariadb-platform-quickstart-guides/security"
-  },
-  {
-    "directive": "slow_query_log",
-    "expected": "ON",
-    "severity": "medium",
-    "description": "Enables logging of slow queries to identify performance bottlenecks and potential security issues from inefficient queries.",
-    "file": "/etc/mysql/mariadb.conf.d/50-server.cnf",
-    "source": "https://mariadb.com/kb/en/server-system-variables/#slow_query_log"
-  },
-  {
-    "directive": "general_log",
-    "expected": "OFF",
+    "directive": "nice",
+    "expected": "19",
     "severity": "low",
-    "description": "Disables the general query log in production to avoid performance overhead, but can be enabled temporarily for auditing.",
-    "file": "/etc/mysql/mariadb.conf.d/50-server.cnf",
-    "source": "https://www.linkedin.com/pulse/securing-mariadb-server-enoch-agbu-prslf"
-  },
-  {
-    "directive": "log_warnings",
-    "expected": "2",
-    "severity": "medium",
-    "description": "Sets the verbosity level for warning logging to include additional details like aborted connections, aiding in security monitoring.",
-    "file": "/etc/mysql/mariadb.conf.d/50-server.cnf",
-    "source": "https://mariadb.com/kb/en/server-system-variables/#log_warnings"
-  },
-  {
-    "directive": "max_connections",
-    "expected": "151",
-    "severity": "low",
-    "description": "Limits the maximum number of simultaneous connections to prevent resource exhaustion and potential denial-of-service attacks.",
-    "file": "/etc/mysql/mariadb.conf.d/50-server.cnf",
-    "source": "https://mariadb.com/kb/en/server-system-variables/#max_connections"
-  },
-  {
-    "directive": "max_user_connections",
-    "expected": "100",
-    "severity": "medium",
-    "description": "Limits the maximum simultaneous connections permitted for each user account to prevent abuse and resource exhaustion.",
-    "file": "/etc/mysql/mariadb.conf.d/50-server.cnf",
-    "source": "https://mariadb.com/kb/en/server-system-variables/#max_user_connections"
-  },
-  {
-    "directive": "datadir",
-    "expected": "/var/lib/mysql",
-    "severity": "medium",
-    "description": "Specifies a dedicated directory for data files on a non-system partition to enhance stability and security by isolating data.",
-    "file": "/etc/mysql/mariadb.conf.d/50-server.cnf",
-    "source": "https://mariadb.com/kb/en/server-system-variables/#datadir"
-  },
-  {
-    "directive": "tmpdir",
-    "expected": "/tmp",
-    "severity": "medium",
-    "description": "Sets the temporary directory to a secure, dedicated location to prevent issues from temporary file overflows or unauthorized access.",
-    "file": "/etc/mysql/mariadb.conf.d/50-server.cnf",
-    "source": "https://mariadb.com/kb/en/server-system-variables/#tmpdir"
-  },
-  {
-    "directive": "enforce_storage_engine",
-    "expected": "InnoDB",
-    "severity": "medium",
-    "description": "Forces new tables to use the InnoDB storage engine, ensuring consistency, crash recovery, and transactional stability.",
-    "file": "/etc/mysql/mariadb.conf.d/50-server.cnf",
-    "source": "https://mariadb.com/kb/en/server-system-variables/#enforce_storage_engine"
-  },
-  {
-    "directive": "max_connect_errors",
-    "expected": "100",
-    "severity": "medium",
-    "description": "Limits successive failed connects from a host before blocking further connections to mitigate brute force attacks.",
-    "file": "/etc/mysql/mariadb.conf.d/50-server.cnf",
-    "source": "https://mariadb.com/kb/en/server-system-variables/#max_connect_errors"
-  },
-  {
-    "directive": "max_password_errors",
-    "expected": "10",
-    "severity": "high",
-    "description": "Sets the maximum permitted number of failed connection attempts due to invalid passwords before blocking a user, preventing brute force attacks.",
-    "file": "/etc/mysql/mariadb.conf.d/50-server.cnf",
-    "source": "https://mariadb.com/kb/en/server-system-variables/#max_password_errors"
+    "description": "Reduces priority of MariaDB process to minimize impact on system performance during high load.",
+    "file": "/etc/mysql/mariadb.conf.d/50-mysqld_safe.cnf",
+    "source": "https://mariadb.com/kb/en/mysqld_safe-systemd/"
   }
 ]

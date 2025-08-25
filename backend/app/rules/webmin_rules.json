@@ -8,14 +8,6 @@
         "source": "https://dox.webmin.com/Webmin/SSL_Encryption.html"
     },
     {
-        "directive": "ssl_redirect",
-        "expected": "1",
-        "severity": "high",
-        "description": "Redirige automatiquement toutes les connexions HTTP non sécurisées vers HTTPS, garantissant que les sessions sont toujours chiffrées et empêchant les attaques de downgrade.",
-        "file": "/etc/webmin/miniserv.conf",
-        "source": "https://dox.webmin.com/Webmin/SSL_Encryption.html"
-    },
-    {
         "directive": "keyfile",
         "expected": "/etc/webmin/mini-server.pem",
         "severity": "high",
@@ -38,102 +30,6 @@
         "description": "Restreint les versions de protocole SSL/TLS aux seules versions sécurisées (TLS 1.2 et 1.3), désactivant les protocoles obsolètes comme SSLv3, TLS 1.0 et 1.1, vulnérables à des attaques connues.",
         "file": "/etc/webmin/miniserv.conf",
         "source": "https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-52r2.pdf"
-    },
-    {
-        "directive": "cipher_list",
-        "expected": "ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305",
-        "severity": "high",
-        "description": "Définit une liste de chiffrements sécurisés, excluant les algorithmes faibles comme 3DES, RC4 ou CBC, conformément aux recommandations NIST pour 2024-2025.",
-        "file": "/etc/webmin/miniserv.conf",
-        "source": "https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-52r2.pdf"
-    },
-    {
-        "directive": "session_timeout",
-        "expected": "1800",
-        "severity": "medium",
-        "description": "Limite la durée d'une session à 30 minutes (1800 secondes) d'inactivité. Cela réduit le risque d'accès non autorisé en cas d'ordinateur laissé sans surveillance.",
-        "file": "/etc/webmin/config",
-        "source": "https://owasp.org/www-project-secure-headers/#session-management"
-    },
-    {
-        "directive": "logout_time",
-        "expected": "30",
-        "severity": "medium",
-        "description": "Force la déconnexion automatique après 30 minutes d'activité, même si l'utilisateur est toujours actif. Cela limite la durée maximale d'une session compromise.",
-        "file": "/etc/webmin/config",
-        "source": "https://owasp.org/www-project-secure-headers/#session-management"
-    },
-    {
-        "directive": "preauth_challenge",
-        "expected": "1",
-        "severity": "high",
-        "description": "Active un défi cryptographique avant l'authentification, empêchant les attaques par dictionnaire en ligne en évitant la transmission directe du mot de passe.",
-        "file": "/etc/webmin/miniserv.conf",
-        "source": "https://dox.webmin.com/Webmin/Authentication_Options.html"
-    },
-    {
-        "directive": "block_host",
-        "expected": "1",
-        "severity": "high",
-        "description": "Bloque temporairement les adresses IP après plusieurs échecs d'authentification, protégeant contre les attaques par force brute.",
-        "file": "/etc/webmin/miniserv.conf",
-        "source": "https://dox.webmin.com/Webmin/Authentication_Options.html"
-    },
-    {
-        "directive": "max_from",
-        "expected": "3",
-        "severity": "high",
-        "description": "Limite le nombre de tentatives d'authentification depuis une même IP à 3, réduisant considérablement le risque d'attaque par force brute.",
-        "file": "/etc/webmin/miniserv.conf",
-        "source": "https://dox.webmin.com/Webmin/Authentication_Options.html"
-    },
-    {
-        "directive": "failed_delay",
-        "expected": "5",
-        "severity": "medium",
-        "description": "Introduit un délai de 5 secondes après chaque échec d'authentification, ralentissant les attaques automatisées et rendant les attaques par dictionnaire moins efficaces.",
-        "file": "/etc/webmin/miniserv.conf",
-        "source": "https://dox.webmin.com/Webmin/Authentication_Options.html"
-    },
-    {
-        "directive": "passwd_mode",
-        "expected": "2",
-        "severity": "medium",
-        "description": "Force les utilisateurs à changer leur mot de passe périodiquement, réduisant le risque d'utilisation de mots de passe compromis sur le long terme.",
-        "file": "/etc/webmin/config",
-        "source": "https://dox.webmin.com/Webmin/Webmin_Users.html"
-    },
-    {
-        "directive": "passwd_min_days",
-        "expected": "7",
-        "severity": "medium",
-        "description": "Empêche le changement de mot de passe plus d'une fois par semaine, empêchant les utilisateurs de contourner la politique de rotation en changeant rapidement plusieurs fois.",
-        "file": "/etc/webmin/config",
-        "source": "https://dox.webmin.com/Webmin/Webmin_Users.html"
-    },
-    {
-        "directive": "passwd_encryption",
-        "expected": "sha512",
-        "severity": "high",
-        "description": "Utilise le hachage SHA-512 pour stocker les mots de passe, offrant une protection robuste contre les attaques par rainbow tables comparé à des méthodes plus faibles comme MD5.",
-        "file": "/etc/webmin/authentic-theme/config",
-        "source": "https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.180-4.pdf"
-    },
-    {
-        "directive": "referers",
-        "expected": "",
-        "severity": "medium",
-        "description": "Restreint l'accès à Webmin aux domaines ou adresses IP spécifiées. Une valeur vide peut être acceptable si combinée à d'autres contrôles, mais un contrôle strict est recommandé.",
-        "file": "/etc/webmin/miniserv.conf",
-        "source": "https://dox.webmin.com/Webmin/Authentication_Options.html"
-    },
-    {
-        "directive": "tcp_wrappers",
-        "expected": "1",
-        "severity": "medium",
-        "description": "Active la compatibilité avec les fichiers /etc/hosts.allow et /etc/hosts.deny, permettant un contrôle d'accès réseau granulaire basé sur IP.",
-        "file": "/etc/webmin/miniserv.conf",
-        "source": "https://linux.die.net/man/5/hosts_access"
     },
     {
         "directive": "log",
@@ -166,29 +62,5 @@
         "description": "Utilise un thème actif et régulièrement mis à jour comme Authentic Theme, qui corrige rapidement les vulnérabilités de sécurité par rapport aux thèmes obsolètes.",
         "file": "/etc/webmin/config",
         "source": "https://github.com/authentic-theme/authentic-theme"
-    },
-    {
-        "directive": "tfa",
-        "expected": "totp",
-        "severity": "high",
-        "description": "Active l'authentification à deux facteurs (2FA) avec TOTP (Time-based One-Time Password), ajoutant une couche de sécurité essentielle contre le vol de mot de passe.",
-        "file": "/etc/webmin/config",
-        "source": "https://dox.webmin.com/Webmin/Two-Factor_Authentication.html"
-    },
-    {
-        "directive": "modules",
-        "expected": "minimal",
-        "severity": "high",
-        "description": "N'active que les modules Webmin strictement nécessaires, réduisant la surface d'attaque en désactivant les fonctionnalités inutilisées qui pourraient contenir des vulnérabilités.",
-        "file": "/etc/webmin/config",
-        "source": "https://www.cisecurity.org/benchmark/webmin"
-    },
-    {
-        "directive": "sessiononly",
-        "expected": "1",
-        "severity": "medium",
-        "description": "Stocke uniquement l'ID de session dans le cookie, sans informations sensibles. Réduit le risque d'exposition de données utilisateur en cas de vol de cookie.",
-        "file": "/etc/webmin/miniserv.conf",
-        "source": "https://owasp.org/www-project-secure-headers/#session-management"
     }
 ]
