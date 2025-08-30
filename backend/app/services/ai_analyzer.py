@@ -32,9 +32,9 @@ Pour chaque directive qui a échoué, fournissez:
 Séparez chaque explication par '|'.
 """
     completion = client.chat.completions.create(
-        model="meta-llama/llama-4-maverick",
+        model="meta-llama/llama-4-maverick:free",
         messages=[{"role": "user", "content": prompt}],
-        timeout=30
+        timeout=60
     )
-    
+
     return completion.choices[0].message.content
