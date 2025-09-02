@@ -1,17 +1,17 @@
-import { useState, useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 import { analyzeAudit } from "../../services";
 
-function ChatBot({ isOpen, onClose, failedAudits = [] }) {
-  const [messages, setMessages] = useState([
-    {
-      text: "Bonjour ! Je suis votre assistant de sécurité. Je vois que vous avez effectué un audit de sécurité. Comment puis-je vous aider aujourd'hui?",
-      sender: "bot",
-      timestamp: new Date(),
-    }
-  ]);
+function ChatBot({ 
+  isOpen, 
+  onClose, 
+  failedAudits = [], 
+  messages, 
+  setMessages, 
+  hasAnalysisRun, 
+  setHasAnalysisRun 
+}) {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const messagesEndRef = useRef(null);
-  const [hasAnalysisRun, setHasAnalysisRun] = useState(false);
   
   useEffect(() => {
     scrollToBottom();

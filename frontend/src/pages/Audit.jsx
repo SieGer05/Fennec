@@ -25,6 +25,16 @@ function Audit() {
   
   const [showChatButton, setShowChatButton] = useState(false);
   const [isChatOpen, setIsChatOpen] = useState(false);
+  
+  // Chat state moved to parent component to persist between opens/closes
+  const [chatMessages, setChatMessages] = useState([
+    {
+      text: "Bonjour ! Je suis votre assistant de sécurité. Je vois que vous avez effectué un audit de sécurité. Comment puis-je vous aider aujourd'hui?",
+      sender: "bot",
+      timestamp: new Date(),
+    }
+  ]);
+  const [hasAnalysisRun, setHasAnalysisRun] = useState(false);
 
   const expectedServices = [
     { name: 'ssh', display: 'SSH', fetchConfig: fetchSSHConfiguration },
@@ -119,7 +129,15 @@ function Audit() {
           <ChatBotButton onClick={() => setIsChatOpen(true)} />
         )}
         {isChatOpen && (
-          <ChatBot isOpen={isChatOpen} onClose={() => setIsChatOpen(false)} />
+          <ChatBot 
+            isOpen={isChatOpen} 
+            onClose={() => setIsChatOpen(false)}
+            failedAudits={failedAudits}
+            messages={chatMessages}
+            setMessages={setChatMessages}
+            hasAnalysisRun={hasAnalysisRun}
+            setHasAnalysisRun={setHasAnalysisRun}
+          />
         )}
       </div>
     );
@@ -144,7 +162,15 @@ function Audit() {
           <ChatBotButton onClick={() => setIsChatOpen(true)} />
         )}
         {isChatOpen && (
-          <ChatBot isOpen={isChatOpen} onClose={() => setIsChatOpen(false)} />
+          <ChatBot 
+            isOpen={isChatOpen} 
+            onClose={() => setIsChatOpen(false)}
+            failedAudits={failedAudits}
+            messages={chatMessages}
+            setMessages={setChatMessages}
+            hasAnalysisRun={hasAnalysisRun}
+            setHasAnalysisRun={setHasAnalysisRun}
+          />
         )}
       </div>
     );
@@ -176,6 +202,10 @@ function Audit() {
           isOpen={isChatOpen} 
           onClose={() => setIsChatOpen(false)}
           failedAudits={failedAudits}
+          messages={chatMessages}
+          setMessages={setChatMessages}
+          hasAnalysisRun={hasAnalysisRun}
+          setHasAnalysisRun={setHasAnalysisRun}
         />
       )}
     </div>
