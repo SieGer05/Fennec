@@ -18,7 +18,7 @@
     <a href="#installation">Installation</a> •
     <a href="#usage">Utilisation</a> •
     <a href="#audit">Audit</a> •
-    <a href="#Intelligence Artificielle (IA)">IA</a> •
+    <a href="#intelligence-artificielle-ia">IA</a> •
     <a href="#contribution">Contribution</a> •
     <a href="#licence">Licence</a>
 </p>
@@ -350,3 +350,14 @@ Si vous ne souhaitez pas contribuer directement au code, vous pouvez :
 ---
 
 Ensemble, faisons de **Fennec** un outil toujours plus puissant et utile pour la communauté !
+
+# Licence
+
+Fennec est un projet **open source** visant à fournir un outil d’audit de sécurité puissant et accessible à tous.
+
+En contribuant ou en utilisant ce projet, vous acceptez de respecter les principes de l’open source :
+- Liberté d’utiliser et de modifier le logiciel.
+- Possibilité de partager vos améliorations.
+- Transparence et collaboration avec la communauté.
+
+Pour le cadre légal précis, Fennec est distribué sous la **MIT License**. Consultez le fichier [LICENSE](./LICENSE) pour plus de détails.
