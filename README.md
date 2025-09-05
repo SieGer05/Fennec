@@ -63,13 +63,12 @@ Fennec offre un ensemble complet de fonctionnalités pour faciliter l’audit et
 
 # Installation
 
-⚠️ Avant de lancer le script, assurez-vous d’avoir configuré votre clé API pour Meta LLaMA 4 Maverick via OpenRouter. Ne la poussez jamais dans le code source ou dans le dépôt Git. Vous pouvez la mettre :
+⚠️ Avant de lancer le script, assurez-vous d’avoir configuré votre clé API pour **Meta LLaMA 4 Maverick via OpenRouter**. Ne la poussez jamais dans le code source ou dans le dépôt Git. Vous pouvez la stocker de manière sécurisée :
 
-- Dans un fichier .env (non commité)
+* Dans un fichier `.env` (non commité)
+* Ou comme variable d'environnement globale
 
-- Ou comme variable d'environnement globale
-
-Fennec est une application web moderne combinant **React.js** (frontend), **FastAPI** (backend Python) et **SQLite** (base de données légère). Suivez ces étapes pour un déploiement rapide et simple :
+Fennec est une application web moderne combinant **React.js** (frontend), **FastAPI** (backend Python) et **SQLite** (base de données légère). Suivez ces étapes pour un déploiement rapide et simple.
 
 ## Prérequis
 
@@ -77,30 +76,40 @@ Fennec est une application web moderne combinant **React.js** (frontend), **Fast
 * **Python ≥3.9** → [Python](https://www.python.org/downloads/)
 * **SQLite3** (intégré par défaut sur la plupart des systèmes)
 
-> ⚠️ Le script d’installation automatique fonctionne uniquement sur **Linux/macOS**. Sur Windows, suivez les commandes manuellement.
+## Installation rapide via script universel (Linux/Windows/macOS)
 
-## Installation rapide via script (Linux/macOS)
-
-Le script `dev-fennec.sh` automatise la configuration et le lancement de Fennec :
+Nous fournissons désormais un script **`dev-fennec.py`** qui fonctionne sur **Linux, macOS et Windows**. Il automatise la configuration et le lancement de Fennec.
 
 ```bash
-# Rendre le script exécutable
-chmod +x dev-fennec.sh
-
 # Lancer le projet
-./dev-fennec.sh
+python dev-fennec.py
 ```
 
-Le script effectue :
+Ce script effectue automatiquement :
 
 * Vérification des prérequis (Python, Node.js, npm, SQLite3)
 * Suppression du fichier `database.db` existant
 * Installation des dépendances backend et frontend si nécessaire
 * Lancement simultané du **backend FastAPI** et du **frontend React**
 
+> Recommandé pour une installation simple et multiplateforme.
+
+---
+
+## Installation via script shell (Linux/macOS uniquement)
+
+Le script `dev-fennec.sh` est également disponible pour les utilisateurs Linux/macOS :
+
+```bash
+chmod +x dev-fennec.sh
+./dev-fennec.sh
+```
+
+---
+
 ## Backend (FastAPI) - manuel
 
-Si vous souhaitez exécuter manuellement :
+Pour exécuter manuellement le backend :
 
 ```bash
 cd backend
@@ -149,6 +158,8 @@ api.get('/health')
 
 ## Configuration IA
 
+Définissez votre clé API OpenRouter :
+
 ```bash
 export OPENROUTER_API_KEY="votre_cle_api"
 ```
@@ -160,10 +171,11 @@ export OPENROUTER_API_KEY="votre_cle_api"
 * Utilisez un environnement virtuel Python pour isoler les dépendances.
 * Vérifiez que le port FastAPI n’est pas bloqué par un firewall.
 * Supprimez `database.db` après les tests pour repartir propre.
-* Configurez correctement CORS et identifiants admin avant la prod.
+* Configurez correctement **CORS** et les identifiants **admin** avant la production.
 * Mettez à jour `axios.js` avec l’URL de votre backend en production.
 
-> Vous êtes maintenant prêt à utiliser Fennec pour auditer vos serveurs avec une interface moderne et des recommandations IA intelligentes.
+
+>Vous êtes maintenant prêt à utiliser **Fennec** pour auditer vos serveurs avec une interface moderne et des recommandations IA intelligentes.
 
 # Utilisation
 
