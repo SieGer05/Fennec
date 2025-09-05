@@ -63,6 +63,12 @@ Fennec offre un ensemble complet de fonctionnalités pour faciliter l’audit et
 
 # Installation
 
+⚠️ Avant de lancer le script, assurez-vous d’avoir configuré votre clé API pour Meta LLaMA 4 Maverick via OpenRouter. Ne la poussez jamais dans le code source ou dans le dépôt Git. Vous pouvez la mettre :
+
+- Dans un fichier .env (non commité)
+
+- Ou comme variable d'environnement globale
+
 Fennec est une application web moderne combinant **React.js** (frontend), **FastAPI** (backend Python) et **SQLite** (base de données légère). Suivez ces étapes pour un déploiement rapide et simple :
 
 ## Prérequis

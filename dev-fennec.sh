@@ -66,6 +66,29 @@ wait_for_service() {
     return 1
 }
 
+check_openrouter() {
+    print_status "Checking OpenRouter API setup..."
+    
+    while true; do
+        echo -e "${YELLOW}Have you set up Meta LLaMA 4 Maverick via OpenRouter? (Y/N)${NC}"
+        read -r response
+        
+        case $response in
+            [Yy]* )
+                print_success "OpenRouter setup confirmed"
+                return 0
+                ;;
+            [Nn]* )
+                print_error "Please set up Meta LLaMA 4 Maverick via OpenRouter first and come back when ready."
+                exit 1
+                ;;
+            * )
+                echo -e "${YELLOW}Please answer Y or N.${NC}"
+                ;;
+        esac
+    done
+}
+
 clear
 echo -e "${CYAN}"
 cat << "EOF"
@@ -84,6 +107,7 @@ print_status "Checking prerequisites for Fennec..."
 check_command python3 || exit 1
 check_command node || exit 1
 check_command npm || exit 1
+check_openrouter || exit 1
 
 check_port 8000 || exit 1
 check_port 5173 || exit 1
