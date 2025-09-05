@@ -61,9 +61,9 @@ Fennec offre un ensemble complet de fonctionnalités pour faciliter l’audit et
    * Vérification de l’intégrité du script d’agent avec un hash.
    * Transmission des données en toute sécurité via SSH.
 
-# Installation 
+# Installation
 
-Fennec est une application web moderne combinant **React.js** (frontend), **FastAPI** (backend Python) et **SQLite** (base de données légère). Suivez ces étapes pour un déploiement rapide et professionnel :
+Fennec est une application web moderne combinant **React.js** (frontend), **FastAPI** (backend Python) et **SQLite** (base de données légère). Suivez ces étapes pour un déploiement rapide et simple :
 
 ## Prérequis
 
@@ -71,28 +71,53 @@ Fennec est une application web moderne combinant **React.js** (frontend), **Fast
 * **Python ≥3.9** → [Python](https://www.python.org/downloads/)
 * **SQLite3** (intégré par défaut sur la plupart des systèmes)
 
-## Backend (FastAPI)
+> ⚠️ Le script d’installation automatique fonctionne uniquement sur **Linux/macOS**. Sur Windows, suivez les commandes manuellement.
+
+## Installation rapide via script (Linux/macOS)
+
+Le script `dev-fennec.sh` automatise la configuration et le lancement de Fennec :
+
+```bash
+# Rendre le script exécutable
+chmod +x dev-fennec.sh
+
+# Lancer le projet
+./dev-fennec.sh
+```
+
+Le script effectue :
+
+* Vérification des prérequis (Python, Node.js, npm, SQLite3)
+* Suppression du fichier `database.db` existant
+* Installation des dépendances backend et frontend si nécessaire
+* Lancement simultané du **backend FastAPI** et du **frontend React**
+
+## Backend (FastAPI) - manuel
+
+Si vous souhaitez exécuter manuellement :
 
 ```bash
 cd backend
-
-# Créer un environnement virtuel
 python -m venv backend-venv
-
-# Activer l'environnement
-# Linux/macOS
-source backend-venv/bin/activate
-# Windows
-backend-venv\Scripts\activate
-
-# Installer les dépendances
+source backend-venv/bin/activate  # Linux/macOS
+# backend-venv\Scripts\activate  # Windows
 pip install -r requirements.txt
-
-# Lancer le serveur FastAPI
 uvicorn app.main:app --reload
 ```
 
-## Frontend (React.js)
+### Configuration Backend
+
+Éditez `backend/app/config.py` pour personnaliser :
+
+```python
+class Settings(BaseSettings):
+    database_url: str = "sqlite:///./database.db"
+    cors_origins: list[str] = ["http://localhost:5173"]
+    admin_username: str = "admin"
+    admin_password_hash: str = "...hash_bcrypt..."  # générer avec passlib bcrypt
+```
+
+## Frontend (React.js) - manuel
 
 ```bash
 cd frontend
@@ -100,9 +125,23 @@ npm install
 npm run dev
 ```
 
-## Configuration de l’IA
+### Configuration Frontend
 
-Définissez la clé OpenRouter pour le modèle IA :
+Dans `frontend/src/api/axios.js` :
+
+```javascript
+const api = axios.create({
+  baseURL: 'http://localhost:8000', // modifier pour la prod
+  timeout: 30000,
+  headers: { 'Content-Type': 'application/json', Accept: 'application/json' }
+});
+
+api.get('/health')
+   .then(res => console.log(res.data))
+   .catch(err => console.error(err));
+```
+
+## Configuration IA
 
 ```bash
 export OPENROUTER_API_KEY="votre_cle_api"
@@ -112,9 +151,11 @@ export OPENROUTER_API_KEY="votre_cle_api"
 
 ## Conseils professionnels
 
-* Utilisez un environnement virtuel pour isoler les dépendances Python.
-* Vérifiez que le port utilisé par FastAPI n’est pas bloqué par un firewall.
-* Supprimez la base SQLite (`database.db`) après les tests pour repartir sur une instance propre.
+* Utilisez un environnement virtuel Python pour isoler les dépendances.
+* Vérifiez que le port FastAPI n’est pas bloqué par un firewall.
+* Supprimez `database.db` après les tests pour repartir propre.
+* Configurez correctement CORS et identifiants admin avant la prod.
+* Mettez à jour `axios.js` avec l’URL de votre backend en production.
 
 > Vous êtes maintenant prêt à utiliser Fennec pour auditer vos serveurs avec une interface moderne et des recommandations IA intelligentes.
 
@@ -247,6 +288,8 @@ Après chaque audit, et une fois votre analyse terminée, il est **recommandé d
 * Un nouvel état propre lors des prochains audits.
 
 ![Create Agent](./docs/usage/13-end.png)
+
+>Si vous utilisez le script automatique dev-fennec.sh, le fichier database.db sera supprimé automatiquement au démarrage du script, garantissant un environnement propre à chaque exécution.
 
 # Intelligence Artificielle (IA)
 
