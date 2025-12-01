@@ -18,7 +18,6 @@ def get_api_key():
             "1. Modify the OPENROUTER_API variable in the code with your API key, or\n"
             "2. Set the OPENROUTER_API_KEY environment variable"
         )
-    
     return api_key
 
 try:
@@ -36,28 +35,35 @@ def analyze_security_audit(audit_data):
         raise RuntimeError("OpenRouter client is not initialized. Please provide a valid API key.")
     
     failed_audits = [a for a in audit_data if not a.get("passed", True)]
+    
     if not failed_audits:
         return "Aucun problème de sécurité détecté."
-
-    audit_json = json.dumps(failed_audits, indent=2)
     
-    prompt = f"""
-Analysez ce rapport d'audit de sécurité et expliquez chaque directive qui a échoué.
+    audit_json = json.dumps(failed_audits, indent=2, ensure_ascii=False)
+    
+    prompt = f"""Tu es un expert en sécurité web. Analyse ce rapport d'audit et explique les problèmes en français simple.
 
 Données d'audit:
 {audit_json}
 
-Pour chaque directive qui a échoué, fournissez:
-1. Nom de la directive
-2. Explication brève en français (2-3 phrases)
-3. Pourquoi c'est important pour la sécurité
+Instructions:
+- Pour chaque problème, donne une explication courte et claire (2-3 phrases maximum)
+- Utilise un langage simple, compréhensible par un administrateur système
+- Explique pourquoi c'est important pour la sécurité
+- Sois direct et concis
+- Sépare chaque explication par une ligne vide
 
-Séparez chaque explication par '|'.
+Format:
+[Nom de la directive]
+[Explication courte du problème]
+[Impact sur la sécurité]
 """
-    completion = client.chat.completions.create(
-        model="meta-llama/llama-4-maverick:free",
+    
+    response = client.chat.completions.create(
+        model="x-ai/grok-4.1-fast:free",
         messages=[{"role": "user", "content": prompt}],
+        extra_body={"reasoning": {"enabled": True}},
         timeout=60
     )
-
-    return completion.choices[0].message.content
+    
+    return response.choices[0].message.content
